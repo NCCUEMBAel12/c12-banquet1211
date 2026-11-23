@@ -817,6 +817,14 @@ const PA = (()=>{
       b += fig(140,y,152,C(0),[[92,96],[.16,.2]].map((a,i)=> i? [140+152*.16+a[0]*152, 0] && [176,198] : a),{abs:1});
       b += `<rect x="70" y="52" width="34" height="52" rx="7" fill="${INK}"/><rect x="75" y="58" width="24" height="36" rx="3" fill="#bfe6ff"/><circle cx="87" cy="99" r="2.4" fill="#fff"/>`;
       return b + txt(88,40,'自拍',15) + txt(300,40,'四人在後面搶鏡',15); },
+    '搶買單': () => { const y=262, h=128; let b=ground(y);
+      b += fig(56,y,h,C(0),[[36,196],[100,150]],{abs:1,rot:6}) + fig(146,y,h,C(1),[[104,150],[166,196]],{abs:1,rot:-6});
+      b += `<rect x="88" y="130" width="28" height="36" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.5"/><path d="M94 140 h16 M94 148 h16 M94 156 h10" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>` + txt(102,120,'我來！',14);
+      b += fig(216,y,h,C(2),[[-.05,.22],[.05,.22]]) + `<circle cx="216" cy="108" r="13" fill="#fff" stroke="${INK}" stroke-width="2.5"/>` + txt(216,114,'?',17);
+      b += fig(278,y,h,C(3),[[-.14,.2],[.1,.02]]);
+      b += `<rect x="298" y="176" width="26" height="17" rx="3" fill="#3aa0ff" stroke="${INK}" stroke-width="2.5"/><path d="M302 182 h18" stroke="#fff" stroke-width="2.5"/><circle cx="312" cy="156" r="11" fill="#7bc96f" stroke="${INK}" stroke-width="2.5"/><path d="M307 156 l4 4 l7 -8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+      b += fig(362,y,h,C(5),[[-.12,-.14],[.1,-.14]],{mood:'o'});
+      return b + txt(100,44,'兩人搶付帳',14) + txt(216,84,'找不到錢包',13) + txt(284,104,'默默刷好卡',13) + txt(352,60,'店員看傻',13); },
     '五連拍表情': () => { const y=262, h=132; let b=ground(y);
       const emo = (x,cy,r,t) => { let e = `<circle cx="${x}" cy="${P(cy)}" r="${P(r)}" fill="${SK}" stroke="${INK}" stroke-width="3"/>`; const L=x-r*.38, R=x+r*.38, ey=cy-r*.12, my=cy+r*.42, st=`fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"`;
         const dots = `<circle cx="${P(L)}" cy="${P(ey)}" r="2.3" fill="${INK}"/><circle cx="${P(R)}" cy="${P(ey)}" r="2.3" fill="${INK}"/>`;
