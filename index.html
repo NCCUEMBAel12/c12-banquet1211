@@ -767,10 +767,10 @@ const PA = (()=>{
       return b + txt(200, 274, '八個人、八種生肖，不能重複', 13); },
     '龜派氣功波': () => { const y=250; let b=ground(y);
       b += `<path d="M112 172 H372" stroke="#3aa0ff" stroke-width="20" stroke-linecap="round" opacity=".22"/><path d="M112 172 H372" stroke="#3aa0ff" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round" opacity=".7"/>`;
-      [6,5,4,3,2,1,0].forEach(i=>{ const x=160+i*28; b += fig(x,y,88,C(i+1),[[-.2,-.3],[.24,-.3]],{rot:10+i*3, mood:'o'}); });
+      [6,5,4,3,2,1,0].forEach(i=>{ const x=160+i*28, lift=26+(i%2)*10; b += `<ellipse cx="${x+6}" cy="${y+1}" rx="13" ry="3.5" fill="${INK}" opacity=".18"/>` + fig(x,y-lift,84,C(i+1),[[-.2,-.3],[.24,-.3]],{rot:12+i*3, mood:'o'}); });
       b += fig(58,y,118,C(0),[[104,166],[104,180]],{abs:1});
       b += `<circle cx="116" cy="172" r="19" fill="#ffc928" stroke="${INK}" stroke-width="3"/><circle cx="116" cy="172" r="9" fill="#fff"/>`;
-      return b + txt(72, 44, '發功！', 19) + txt(280, 44, '七人同時往後彈', 15); },
+      return b + txt(72, 44, '發功！', 19) + txt(280, 44, '七人同時往後跳、雙腳離地', 14); },
     '手拼愛心': () => { let b=''; const pts=[]; for(let i=0;i<=100;i++){ const t=i/100*TAU; pts.push([200+16*Math.pow(Math.sin(t),3)*6.2, 136-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*6.2]); }
       [[150,106],[250,106],[200,136],[165,171],[235,171]].forEach((f,i)=> b += `<ellipse cx="${f[0]}" cy="${f[1]+30}" rx="24" ry="20" fill="${C(i)}" stroke="${INK}" stroke-width="3"/>` + face(f[0],f[1],21));
       const d = k => pts.slice(k*20,k*20+21).map((p,i)=>(i?'L':'M')+P(p[0])+' '+P(p[1])).join(' ');
@@ -859,7 +859,7 @@ const ALL_ROUNDS = [ // 原則：要全組一起才成立；每個主題只出�
     '指尖星星：圍成一圈低頭，每人伸一隻手比 YA，八個 YA 指尖相接拼成一顆大星星，手機放低從下往上拍，八顆頭都要圍在星星外圈露出來',
     '千手觀音：排成一直線，十六隻手一隻都不能重疊',
     '十二地支：八人各演一種生肖動物，不能重複，要讓看照片的人猜得出來',
-    '龜派氣功波：一人在最前面發功，其他七人同時往後彈飛（站著往後仰就好），抓拍那一瞬間',
+    '龜派氣功波：一人在最前面發功，其他七人同時往後跳開、雙腳離地，像被震飛，攝影師抓拍騰空那一瞬間（連拍比較容易成功）',
     '多頭龍：全組排成一直線前後貼緊，鏡頭從正面拍，只看到一個身體和左右錯開探出來的八顆頭，表情越嚴肅越好笑'],
   poses:[
     '手掌太陽：八人圍成一圈低頭，十六隻手掌向中間張開成太陽光芒，手機從下往上拍',
