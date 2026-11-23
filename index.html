@@ -750,7 +750,7 @@ const PA = (()=>{
     return b + `<circle cx="${cx}" cy="${cy}" r="${core-3}" fill="#ffc928" stroke="${INK}" stroke-width="3"/>`; }
   const poly = (pts, w=11) => pts.slice(0,-1).map((p,i)=>seg(p[0],p[1],pts[i+1][0],pts[i+1][1],C(i),w)).join('') + pts.map(p=>hand(p[0],p[1],6)).join('');
   const D = {
-    '指尖星星': () => yaRing(8,106,62,40,15),
+    '指尖星星': () => yaRing(8,106,54,43,15),
     '十二地支': () => { const y=250, h=104; let b=ground(y);
       const ear = { // 每種生肖畫在頭上的特徵（cx、頭頂 cy、頭半徑 r）
         '鼠': (x,t,r)=> [-1,1].map(k=>`<circle cx="${P(x+k*r*.85)}" cy="${P(t+r*.2)}" r="${P(r*.55)}" fill="#cfc8e8" stroke="${INK}" stroke-width="2.2"/>`).join(''),
