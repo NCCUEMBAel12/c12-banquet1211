@@ -895,6 +895,7 @@ const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floo
 const pk = (a,b) => a<b ? a+'|'+b : b+'|'+a;
 const gColor = i => `hsl(${(i*47+350)%360} 62% 42%)`;
 const isVip = p => p && p.role !== '學長姐';
+const roleLabel = p => { if(!p) return ''; if(p.role!=='學長姐') return p.role||''; const g = gnorm(p.gender); return g==='男' ? '學長' : g==='女' ? '學姊' : '學長姐'; };
 const isMC = id => !!(S().players[id]||{}).mc; // 主持人也下場：照常分組、入鏡，但快答不作答、排序不當作答手機、不列入排行
 const LS = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}} };
 const SS = { get(k){try{return sessionStorage.getItem(k)}catch(e){return null}}, set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}} };
@@ -1193,7 +1194,7 @@ function renderPlayer(){
   if(!me){ if(window._ciNote){ $('#ciErr').textContent = window._ciNote; window._ciNote = ''; } const hasR = roster().length>0; $('#ciRoleField').hidden = hasR && !window._walkin; $('#ciWalkin').hidden = !hasR || !!window._walkin; renderSug();
     setHTML($('#ciRoles'), ROLES.map(r=>`<button class="chip" data-act="role" data-r="${r}" aria-pressed="${(window._ciRole||'學長姐')===r}">${r}</button>`).join('')); return; }
   const rk = ranking(), mine = rk.find(x=>x.id===ME);
-  setHTML($('#pWho'), `${esc(me.name)}<small>${esc(me.role)}</small>`);
+  setHTML($('#pWho'), `${esc(me.name)}<small>${esc(roleLabel(me))}</small>`);
   $('#pToHost').hidden = VIEW==='all' || !(hostOK || isMC(ME)); // 主持人同一支手機兩邊切換用
   $('#pScore').textContent = isMC(ME) ? '主持人' : `${mine ? mine.total : 0} 分`;
   ['Game','Wall','Rank','Flow'].forEach(t=>{ $('#pTab'+t).hidden = t!==pTab; });
@@ -1246,7 +1247,7 @@ function playerPhoto(c){
   const head = `<div class="eyebrow">拾笑容 · 第 ${r+1}/${ROUNDS.length} 回合 · ${esc(R.title)}</div>`;
   if(c.roundState==='chat'){ // 先聊近況：只公布組員和話題，姿勢和攝影師等時間到才出現
     if(gi<0) return `<div class="card">${head}<h2 class="h-l">正在幫你安排組別…</h2></div>`;
-    const g = gs[gi], mem = g.m.map(id=>{ const p=S().players[id]||{}; return `<li>${esc(p.name)} <span class="role ${isVip(p)?'vip':''}">${esc(p.role)}</span>${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('');
+    const g = gs[gi], mem = g.m.map(id=>{ const p=S().players[id]||{}; return `<li>${esc(p.name)} <span class="role ${isVip(p)?'vip':''}">${esc(roleLabel(p))}</span>${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('');
     return `<div class="card" style="display:flex;flex-direction:column;gap:14px">${head}
       <div style="display:flex;align-items:center;gap:10px"><h2 class="h-l" style="margin:0;flex:1">先聊聊近況</h2><span class="timer mm">${clock(chatDead(c))}</span></div>
       <div class="grp-badge"><div class="grp-num" style="background:${gColor(gi)}">${gi+1}</div>
@@ -1279,7 +1280,7 @@ function playerPhoto(c){
   const g = gs[gi], up = S().uploads[`${r}_${gi}`], rankIdx = up ? ranks.findIndex(u=>u.g===gi) : -1;
   const outside = g.cam && !g.m.includes(g.cam), myWait = outside ? camWait(gs, gi) : -1, myReady = myWait<0 || !!S().uploads[`${r}_${myWait}`];
   const away = g.m.filter(id=> id!==ME && gs.some(x=> x.cam===id && !x.m.includes(id))).map(pname).map(esc).join('、');
-  const mem = g.m.map(id=>{ const p=S().players[id]||{}; return `<li>${esc(p.name)} <span class="role ${isVip(p)?'vip':''}">${esc(p.role)}</span>${p.team?`<span class="role">原${esc(p.team)}</span>`:''}${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('');
+  const mem = g.m.map(id=>{ const p=S().players[id]||{}; return `<li>${esc(p.name)} <span class="role ${isVip(p)?'vip':''}">${esc(roleLabel(p))}</span>${p.team?`<span class="role">原${esc(p.team)}</span>`:''}${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('');
   const order = !outside ? '' : myWait<0
       ? `<div class="order first">① 先拍組・現在就擺好姿勢${away?`，${away} 先留下來一起入鏡，拍完再去支援別組`:''}</div>`
       : myReady ? `<div class="order go">② 輪到你們了！第 ${myWait+1} 組已經拍完，攝影師正在過來</div>`
@@ -1610,7 +1611,7 @@ function hostCheckin(){
   <div class="card"><b>已報到 ${ps.length} 人</b>${PREVIEW?' <button class="btn sim" data-act="simJoin">模擬再來 3 位晚到</button>':''}
     ${absent.length?`<div class="note" style="margin-top:8px">名冊上還沒報到 ${absent.length} 人：${absent.map(x=>esc(x.name)).join('、')}</div>`:''}
     <div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>#</th><th>姓名</th><th>身分</th><th>性別</th><th>原組別</th>${ROUNDS.map((_,i)=>`<th>R${i+1}</th>`).join('')}<th></th></tr></thead><tbody>
-    ${ps.map((p,i)=>`<tr><td class="num">${i+1}</td><td style="${p.gone?'opacity:.5':''}">${esc(p.name)}${p.mc?' <span class="role vip">主持人</span>':''}${p.gone?' <span class="role">已離席</span>':''}</td><td><span class="role ${isVip(p)?'vip':''}">${esc(p.role)}</span></td><td>${esc(p.gender||'–')}</td><td>${esc(p.team||'–')}</td>
+    ${ps.map((p,i)=>`<tr><td class="num">${i+1}</td><td style="${p.gone?'opacity:.5':''}">${esc(p.name)}${p.mc?' <span class="role vip">主持人</span>':''}${p.gone?' <span class="role">已離席</span>':''}</td><td><span class="role ${isVip(p)?'vip':''}">${esc(roleLabel(p))}</span></td><td>${esc(p.gender||'–')}</td><td>${esc(p.team||'–')}</td>
       ${ROUNDS.map((_,r)=>{const gi=(ag[r]||[]).findIndex(g=>g.m.includes(p.id)); return `<td class="num">${gi<0?'–':gi+1}</td>`;}).join('')}
       <td><button class="btn" data-act="goneToggle" data-id="${p.id}" style="${p.gone?'background:var(--yellow)':''}">${p.gone?'✓ 已離席・改回在場':'先行離席'}</button> ${window._delArm===p.id?`<button class="btn pri" data-act="delP2" data-id="${p.id}">確定移除</button>`:`<button class="btn" data-act="delP" data-id="${p.id}">移除</button>`} <button class="btn" data-act="mcToggle" data-id="${p.id}" style="${p.mc?'background:var(--yellow)':''}">${p.mc?'✓ 主持人下場中':'設為主持人'}</button> <button class="btn" data-act="g2Toggle" data-id="${p.id}" style="${p.noG2?'background:var(--yellow)':''}">${p.noG2?'✓ 不玩遊戲二':'不玩遊戲二'}</button></td></tr>`).join('')}
     </tbody></table></div></div>`;
@@ -2202,7 +2203,7 @@ function playerPuzzle(c){
       <div style="display:flex;align-items:center;gap:10px"><h2 class="h-l" style="margin:0;flex:1">和拼圖隊友聊聊近況</h2><span class="timer mm">${clock(pzChatDead(c))}</span></div>
       <div class="grp-badge"><div class="grp-num" style="background:${gColor(mi)}">${mi+1}</div>
         <div style="min-width:0"><div class="muted" style="font-size:14px">第 ${mi+1} 組・${pzAll(G).length} 人・每人輪流說</div><p class="pose">💬 ${esc(chatTopic(mi))}</p></div></div>
-      <ul class="members">${pzAll(G).map(id=>{ const q=S().players[id]||{}; return `<li>${esc(q.name)} <span class="role ${isVip(q)?'vip':''}">${esc(q.role)}</span>${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('')}</ul>
+      <ul class="members">${pzAll(G).map(id=>{ const q=S().players[id]||{}; return `<li>${esc(q.name)} <span class="role ${isVip(q)?'vip':''}">${esc(roleLabel(q))}</span>${id===ME?'<span class="me-tag">我</span>':''}</li>`; }).join('')}</ul>
       <div class="note">時間到會接著玩「拾時光」時光排序，還是同一組人，先不要散開。</div></div>`; }
   const gi = gs.findIndex(g=>g.cells.includes(ME));
   if(gi<0) return `<div class="card">${head}<h2 class="h-l">這一輪的拼圖已經發完了</h2><p class="muted" style="margin:6px 0 0">你比較晚到，先幫旁邊的人找隊友吧。下一個遊戲會把你排進組裡。</p></div>`;
