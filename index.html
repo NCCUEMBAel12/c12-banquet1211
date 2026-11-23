@@ -808,6 +808,55 @@ const PA = (()=>{
         [-1,1].forEach(d=>{ const ta=a+d*TAU/n/2, tx=cx+Math.cos(ta)*168, ty=cy+Math.sin(ta)*122, px=-Math.sin(ta), py=Math.cos(ta); b += seg(fx,fy,tx-px*d*4,ty-py*d*4,C(k),7) + hand(tx-px*d*5,ty-py*d*5,5.5); }); }
       for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k); b += `<circle cx="${P(fx)}" cy="${P(fy)}" r="20" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + face(fx,fy,15); }
       return b; },
+    '搶鏡': () => { const y=262; let b=ground(y);
+      [[218,-12],[262,8],[304,-8],[342,10]].forEach(([x,rot],i)=> b += fig(x,y-(i%2?0:16),116,C(i+1),[[-.2,-.34],[.2,-.34]],{rot, mood:'o', ground:y}));
+      b += fig(140,y,152,C(0),[[92,96],[.16,.2]].map((a,i)=> i? [140+152*.16+a[0]*152, 0] && [176,198] : a),{abs:1});
+      b += `<rect x="70" y="52" width="34" height="52" rx="7" fill="${INK}"/><rect x="75" y="58" width="24" height="36" rx="3" fill="#bfe6ff"/><circle cx="87" cy="99" r="2.4" fill="#fff"/>`;
+      return b + txt(88,40,'自拍',15) + txt(300,40,'四人在後面搶鏡',15); },
+    '五連拍表情': () => { const y=262, h=132; let b=ground(y);
+      const emo = (x,cy,r,t) => { let e = `<circle cx="${x}" cy="${P(cy)}" r="${P(r)}" fill="${SK}" stroke="${INK}" stroke-width="3"/>`; const L=x-r*.38, R=x+r*.38, ey=cy-r*.12, my=cy+r*.42, st=`fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"`;
+        const dots = `<circle cx="${P(L)}" cy="${P(ey)}" r="2.3" fill="${INK}"/><circle cx="${P(R)}" cy="${P(ey)}" r="2.3" fill="${INK}"/>`;
+        if(t==='喜') e += `<path d="M${P(L-4)} ${P(ey+2)} q4 -6 8 0 M${P(R-4)} ${P(ey+2)} q4 -6 8 0 M${P(x-7)} ${P(my-3)} q7 8 14 0" ${st}/>`;
+        if(t==='怒') e += dots + `<path d="M${P(L-5)} ${P(ey-9)} l10 5 M${P(R+5)} ${P(ey-9)} l-10 5 M${P(x-7)} ${P(my+3)} q7 -8 14 0" ${st}/>`;
+        if(t==='哀') e += dots + `<path d="M${P(L-5)} ${P(ey-5)} l10 -5 M${P(R+5)} ${P(ey-5)} l-10 -5 M${P(x-6)} ${P(my+3)} q6 -6 12 0" ${st}/><path d="M${P(R+2)} ${P(ey+5)} q-4 7 0 10 q4 -3 0 -10 z" fill="#3aa0ff" stroke="${INK}" stroke-width="1.5"/>`;
+        if(t==='樂') e += `<path d="M${P(L-4)} ${P(ey+2)} q4 -6 8 0 M${P(R-4)} ${P(ey+2)} q4 -6 8 0" ${st}/><path d="M${P(x-8)} ${P(my-5)} h16 q-1 11 -8 11 q-7 0 -8 -11 z" fill="${INK}"/>`;
+        if(t==='驚') e += `<circle cx="${P(L)}" cy="${P(ey)}" r="4" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="${P(R)}" cy="${P(ey)}" r="4" fill="#fff" stroke="${INK}" stroke-width="2"/><ellipse cx="${x}" cy="${P(my+1)}" rx="4.5" ry="6" fill="${INK}"/>`;
+        return e; };
+      const arms = [[[-.2,-.2],[.2,-.2]], [[-.07,.14],[.07,.14]], [[-.02,-.02],[.02,-.02]], [[-.22,-.06],[.22,-.3]], [[-.2,-.12],[.2,-.12]]];
+      ['喜','怒','哀','樂','驚'].forEach((t,i)=>{ const x=72+i*64, r=h*.15, hy=y-h+r; b += fig(x,y,h,C(i),arms[i]) + emo(x,hy,r,t) + `<circle cx="${x}" cy="62" r="19" fill="#fff" stroke="${INK}" stroke-width="3"/>` + txt(x,70,t,22); });
+      return b; },
+    '愛心五連發': () => { const y=262, h=132; let b=ground(y);
+      const heart = (x,yy,z) => `<path d="M${P(x)} ${P(yy+z*.9)} C${P(x-z*1.6)} ${P(yy-z*.2)} ${P(x-z*.8)} ${P(yy-z*1.3)} ${P(x)} ${P(yy-z*.4)} C${P(x+z*.8)} ${P(yy-z*1.3)} ${P(x+z*1.6)} ${P(yy-z*.2)} ${P(x)} ${P(yy+z*.9)} Z" fill="#ff4f8b" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      const sh = y-h+h*.4, top = y-h;
+      const A = [ [[72-20,top-22],[72+20,top-22]], [[136-6,sh+24],[136+6,sh+24]], [[200-40,sh+16],[200+34,sh-30]], [[264-15,top+34],[264+15,top+34]], [[328-36,sh-6],[328+36,sh-6]] ];
+      A.forEach((a,i)=> b += fig(72+i*64,y,h,C(i),a,{abs:1}));
+      b += heart(72,top-36,17) + heart(136,sh+22,9) + heart(238,sh-44,7) + heart(264-25,top+30,6) + heart(264+25,top+30,6) + heart(328-40,sh-20,8) + heart(328+40,sh-20,8);
+      return b + txt(200,34,'五種愛心，不能重複',15); },
+    'KTV 歡唱': () => { const y=264; let b=ground(y);
+      [[84,-10],[200,0],[316,10]].forEach(([x,rot],i)=> b += fig(x,y-(i===1?34:14),118,C(i+2),[[-.22,-.3],[.22,-.3]],{rot, ground:y}));
+      const mic = (x,yy) => `<path d="M${x} ${yy} v20" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><ellipse cx="${x}" cy="${yy-6}" rx="7" ry="9" fill="#cfd3dc" stroke="${INK}" stroke-width="2.5"/>`;
+      b += fig(150,y+8,146,C(0),[[108,204],[170,176]],{abs:1,mood:'o'}) + mic(170,170);
+      b += fig(250,y+8,146,C(1),[[230,176],[292,204]],{abs:1,mood:'o'}) + mic(230,170);
+      const note = (x,yy,z=1) => `<path d="M${x} ${yy} v${-22*z} l${10*z} ${4*z}" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${x-5*z}" cy="${yy}" rx="${6*z}" ry="${4.5*z}" fill="${INK}"/>`;
+      return b + note(60,90) + note(92,58,.8) + note(340,82) + note(312,52,.8) + txt(200,32,'兩人對唱、三人伴舞',15); },
+    '多頭龍': () => { const x=200, y=266, h=150, r=h*.15, hy=y-h+r; let b=ground(y,90,310);
+      const nf = (fx,fy) => `<circle cx="${P(fx)}" cy="${P(fy)}" r="${P(r)}" fill="${SK}" stroke="${INK}" stroke-width="3"/><circle cx="${P(fx-r*.35)}" cy="${P(fy-r*.1)}" r="2.4" fill="${INK}"/><circle cx="${P(fx+r*.35)}" cy="${P(fy-r*.1)}" r="2.4" fill="${INK}"/><path d="M${P(fx-r*.3)} ${P(fy+r*.45)} h${P(r*.6)}" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>`;
+      for(let k=7;k>=1;k--){ const side = k%2 ? -1 : 1, lv = Math.ceil(k/2), fx = x + side*(9+lv*19), fy = hy - lv*15; b += `<ellipse cx="${P(fx)}" cy="${P(fy+r+9)}" rx="13" ry="9" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + nf(fx,fy); }
+      b += fig(x,y,h,C(0),[[-.07,.3],[.07,.3]]) + nf(x,hy);
+      return b + txt(200,30,'一個身體、八顆頭，表情越嚴肅越好',14); },
+    '大愛心': () => { const cx=200, cy=112, z=6.3; let b=''; const pt = t => [cx+16*Math.pow(Math.sin(t),3)*z*1.12, cy-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*z];
+      let d=''; for(let i=0;i<=80;i++){ const p=pt(i/80*TAU); d += (i?'L':'M')+P(p[0])+' '+P(p[1])+' '; }
+      b += `<path d="${d}Z" fill="#ffe3ee" stroke="#ff4f8b" stroke-width="4" stroke-dasharray="3 9" stroke-linecap="round"/>`;
+      { const S=[]; let L=0, prev=pt(0); for(let i=1;i<=400;i++){ const q=pt(i/400*TAU); L+=Math.hypot(q[0]-prev[0],q[1]-prev[1]); S.push([L,q]); prev=q; } const N=10; for(let i=0;i<N;i++){ const want=(i+.5)/N*L, q=S.find(e=>e[0]>=want)[1]; b += top(q[0],q[1],C(i),10); } }
+      [[178,112],[222,112],[178,148],[222,148]].forEach(p=> b += top(p[0],p[1],'#ffc928',11) + `<path d="M${p[0]-4} ${p[1]-23} l4 -7 l4 7 z" fill="#ffc928" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`);
+      return b + txt(200,270,'四位主角站中間，攝影師從上往下拍',14); },
+    '靜止的派對': () => { const y=262; let b=ground(y);
+      b += fig(52,y,128,C(0),[[30,150],[84,120]],{abs:1}) + `<rect x="78" y="96" width="13" height="30" rx="4" transform="rotate(48 84 112)" fill="#7bc96f" stroke="${INK}" stroke-width="2.5"/><path d="M98 126 q10 14 8 34" fill="none" stroke="#3aa0ff" stroke-width="3" stroke-dasharray="3 6" stroke-linecap="round"/><path d="M96 162 h20 l-3 20 h-14 z" fill="#fff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      b += fig(150,y,128,C(1),[[-.2,.02],[.1,.1]],{rot:-16}) + txt(128,112,'哈',17) + txt(112,92,'哈',14);
+      b += `<ellipse cx="208" cy="${y+1}" rx="16" ry="4" fill="${INK}" opacity=".18"/>` + fig(208,y-34,120,C(2),[[-.24,-.3],[.24,-.3]]);
+      b += fig(272,y,128,C(3),[[-.22,-.28],[.22,.06]],{rot:10});
+      b += fig(334,y,128,C(4),[[-.14,.2],[.16,-.2]]) + `<path d="M366 126 h14 l-2 18 h-10 z" fill="#ffc928" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      return b + `<circle cx="200" cy="40" r="24" fill="#fff" stroke="${INK}" stroke-width="3.5"/><path d="M192 28 v24 M208 28 v24" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>` + txt(296,46,'全員定格',15); },
     '手掌太陽': () => palms(8, 22, 20),
     '用手臂比字': () => { const S=[[[120,50],[120,91]],[[120,91],[120,132]],[[120,132],[120,173]],[[120,173],[120,214]], [[232,60],[316,60]],[[316,60],[316,134]],[[316,134],[232,214]],[[232,214],[320,214]]];
       let b=''; S.forEach((s,i)=> b += seg(s[0][0],s[0][1],s[1][0],s[1][1],C(i),13)); S.forEach(s=> b += face((s[0][0]+s[1][0])/2,(s[0][1]+s[1][1])/2,14)); return b; },
