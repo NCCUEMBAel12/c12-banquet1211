@@ -733,13 +733,15 @@ const PA = (()=>{
   }
   const top = (x,y,c,r=11) => `<ellipse cx="${P(x)}" cy="${P(y)}" rx="${P(r*1.5)}" ry="${P(r)}" fill="${c}" stroke="${INK}" stroke-width="2.5"/><circle cx="${P(x)}" cy="${P(y)}" r="${P(r*.72)}" fill="${SK}" stroke="${INK}" stroke-width="2.2"/>`;
   // 從下往上拍：n 個人圍一圈，每人一隻手比 YA，指尖相接
-  function yaRing(n, FR, R, r, fr, cy=142){ let b=''; const cx=200, m=n*2; // 每人兩隻手都比 YA：2n 個 YA 指尖相接
-    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, fx=cx+Math.cos(a)*FR*1.12, fy=cy+Math.sin(a)*FR;
-      [-.5,.5].forEach(d=>{ const ha=a+d*TAU/m, hx=cx+Math.cos(ha)*R*1.08, hy=cy+Math.sin(ha)*R;
-        b += seg(fx,fy,hx,hy,C(k),6);
-        [-1,1].forEach(e=>{ const ia=ha+e*Math.PI/m, ix=cx+Math.cos(ia)*r*1.08, iy=cy+Math.sin(ia)*r; b += seg(hx,hy,ix,iy,SK,3).replace(/stroke-width="(\d+\.?\d*)"/, ()=>`stroke-width="6.5"`); });
+  function yaRing(n, FR, R, r, fr, cy=142){ let b=''; const cx=200, m=n*2, E=1.1; // 每人兩隻手都比 YA；手臂在手肘彎曲，頭卡在兩隻手臂之間朝下看
+    const at = (a,rad,lat) => [cx+Math.cos(a)*rad*E - Math.sin(a)*lat, cy+Math.sin(a)*rad + Math.cos(a)*lat];
+    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, [bx,by]=at(a,FR+12,0);
+      b += `<ellipse cx="${P(bx)}" cy="${P(by)}" rx="${P(fr+13)}" ry="${P(fr+3)}" transform="rotate(${P(a*180/Math.PI+90)} ${P(bx)} ${P(by)})" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>`;
+      [-1,1].forEach(d=>{ const [sx,sy]=at(a,FR+8,d*(fr+9)), [ex,ey]=at(a,(FR+R)/2+2,d*(fr+11)), ha=a+d*.5*TAU/m, hx=cx+Math.cos(ha)*R*E, hy=cy+Math.sin(ha)*R;
+        b += `<path d="M${P(sx)} ${P(sy)} L${P(ex)} ${P(ey)} L${P(hx)} ${P(hy)}" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M${P(sx)} ${P(sy)} L${P(ex)} ${P(ey)} L${P(hx)} ${P(hy)}" fill="none" stroke="${C(k)}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+        [-1,1].forEach(e=>{ const ia=ha+e*Math.PI/m, ix=cx+Math.cos(ia)*r*E, iy=cy+Math.sin(ia)*r; b += seg(hx,hy,ix,iy,SK,3).replace(/stroke-width="(\d+\.?\d*)"/, ()=>`stroke-width="6.5"`); });
         b += hand(hx,hy,4.5); }); }
-    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, fx=cx+Math.cos(a)*FR*1.12, fy=cy+Math.sin(a)*FR; b += `<circle cx="${P(fx)}" cy="${P(fy)}" r="${P(fr+5)}" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + face(fx,fy,fr); }
+    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, [fx,fy]=at(a,FR-4,0); b += face(fx,fy,fr); }
     return b; }
   // 從下往上拍：n 個人圍一圈，2n 隻手掌向中間張開
   function palms(n, ry, core){ let b=''; const cx=200, cy=142, m=n*2;
@@ -750,7 +752,7 @@ const PA = (()=>{
     return b + `<circle cx="${cx}" cy="${cy}" r="${core-3}" fill="#ffc928" stroke="${INK}" stroke-width="3"/>`; }
   const poly = (pts, w=11) => pts.slice(0,-1).map((p,i)=>seg(p[0],p[1],pts[i+1][0],pts[i+1][1],C(i),w)).join('') + pts.map(p=>hand(p[0],p[1],6)).join('');
   const D = {
-    '指尖星星': () => yaRing(8,106,54,43,15),
+    '指尖星星': () => yaRing(8,100,52,41,14),
     '十二地支': () => { const y=250, h=104; let b=ground(y);
       const ear = { // 每種生肖畫在頭上的特徵（cx、頭頂 cy、頭半徑 r）
         '鼠': (x,t,r)=> [-1,1].map(k=>`<circle cx="${P(x+k*r*.85)}" cy="${P(t+r*.2)}" r="${P(r*.55)}" fill="#cfc8e8" stroke="${INK}" stroke-width="2.2"/>`).join(''),
