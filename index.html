@@ -474,7 +474,9 @@ body.tri .pnav{position:sticky;bottom:-12px;margin:12px -12px -12px}
 #pvJump button{padding:3px 10px;font-size:12px}
 #pvJump span{color:#b9b3e6;font-size:12px;margin-left:8px}
 /* 拼圖與時光排序 */
-.piece{position:relative;width:min(100%,calc(44vh * 3 / 5));aspect-ratio:3/5;margin:0 auto;border:var(--bd);border-radius:18px;background-color:#ece8fa;background-repeat:no-repeat;box-shadow:var(--sh)}
+.piece{--pw:100vw;position:relative;width:var(--pw);max-width:none;flex:none;aspect-ratio:3/5;margin:0 0 0 calc(50% - var(--pw) / 2);border:0;border-radius:0;background-color:#ece8fa;background-repeat:no-repeat} /* 滿版：和螢幕同寬、沒有邊框，手機並排時圖才接得起來 */
+@media (min-width:560px){.piece{--pw:min(100vw,calc(82vh * 3 / 5))}}
+body.tri .piece{--pw:min(100%,calc(44vh * 3 / 5));border:var(--bd);border-radius:18px}
 .pdigit{position:absolute;top:8px;right:8px;width:46px;height:46px;border-radius:50%;background:var(--yellow);border:var(--bd);display:grid;place-items:center;font-family:var(--f-num);font-weight:700;font-size:26px}
 .pzfull{width:100%;border:var(--bd);border-radius:16px;background:#ece8fa center/100% 100% no-repeat}
 .pzview{flex:1;min-height:0;background:center/contain no-repeat;border-radius:.9cqw}
@@ -2324,7 +2326,7 @@ function playerPuzzle(c){
       <div style="font-weight:700">你的隊友：${pzMem(g).map(pname).map(esc).join('、')}</div>
       <div class="muted" style="font-size:15px">記住這組人，下一個遊戲還是同一組。</div></div>`; }
   const pos = (v,t) => t>1 ? v/(t-1)*100 : 0;
-  return `<div class="card" style="display:flex;flex-direction:column;gap:12px">${head}<div style="display:flex;align-items:center;gap:10px"><h2 class="h-l" style="margin:0;flex:1">找到和你同一張圖的人</h2><span class="timer mm">${clock(pzDead(c))}</span></div><div class="muted" style="font-size:15px">先用顏色找，但有的組顏色很接近，拼得起來才算數。</div>
+  return `<div class="card" style="display:flex;flex-direction:column;gap:12px">${head}<div style="display:flex;align-items:center;gap:10px"><h2 class="h-l" style="margin:0;flex:1">找到和你同一張圖的人</h2><span class="timer mm">${clock(pzDead(c))}</span></div><div class="muted" style="font-size:15px">先用顏色找，但有的組顏色很接近，拼得起來才算數。圖片和螢幕一樣寬，把手機邊靠邊排在一起就能接起來。</div>
     <div class="piece" style="background-image:url(${url});background-size:${g.cols*100}% ${g.rows*100}%;background-position:${pos(col,g.cols)}% ${pos(row,g.rows)}%"><span class="pdigit">${digit}</span></div>
     <div class="muted" style="font-size:15px">這張圖共 ${n} 片，排成 ${g.cols} 欄 ${g.rows} 列${g.cols*g.rows>n?'（其中 1 格是空的）':''}。把手機排在一起拼回原圖，再把每一片右上角的數字，由左到右、由上到下唸出來，就是通關密碼。</div>
     <div style="display:flex;gap:8px"><input id="pzCode" inputmode="numeric" maxlength="${n}" placeholder="${n} 位數密碼" style="flex:1;min-width:0;border:var(--bd);border-radius:14px;padding:10px;font-size:22px;text-align:center"><button class="btn pri" data-act="pzSubmit" style="font-size:18px">送出</button></div>
