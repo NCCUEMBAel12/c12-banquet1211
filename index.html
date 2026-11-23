@@ -2350,8 +2350,8 @@ function playerTimeline(c){
   if(cap && cap!==ME) return `<div class="card" style="display:flex;flex-direction:column;gap:12px">${head}
     <div class="camline">📱 第 ${gi+1} 組由 <b>${esc(pname(cap))}</b> 的手機作答，請圍過去一起討論</div>
     <div style="display:flex;align-items:center;gap:10px;font-weight:700"><span style="flex:1">限時 ${TL_SEC/60} 分鐘，時間到會自動送出</span><span class="timer mm">${clock(tlDead(c))}</span></div>
-    <div class="tlpick">${shown.map(p=>`<span class="tlp" ${tlAttr(p)}></span>`).join('')}</div>
-    <div class="muted" style="font-size:15px">你的手機可以看照片，但只有指定的那支手機能排順序和送出。</div></div>`;
+    <div class="tlpick">${shown.map(p=>`<button class="tlp" data-act="tlZoom" data-id="${p.id}" ${tlAttr(p)} aria-label="放大看照片"></button>`).join('')}</div>
+    <div class="muted" style="font-size:15px">🔍 點照片可以放大看。你的手機可以看照片，但只有指定的那支手機能排順序和送出。</div></div>`;
   const base = shown.map(p=>p.id); // 一開始是打亂的；作答手機把照片拖到正確位置，格子的順序就是答案
   if(tlOrder.length!==base.length || tlOrder.some(id=>!base.includes(id))) tlOrder = base;
   const byId = Object.fromEntries(ph.map(p=>[p.id,p])), n = tlOrder.length;
@@ -2360,7 +2360,8 @@ function playerTimeline(c){
     <div style="display:flex;align-items:center;gap:10px;font-weight:700"><span style="flex:1">限時 ${TL_SEC/60} 分鐘，時間到會照目前的排法自動送出</span><span class="timer mm">${clock(tlDead(c))}</span></div>
     <div class="tldir"><b>① 最早</b><span>由左到右、由上到下 →</span><b>最晚 ${n}</b></div>
     <div class="tlpick" id="tlGrid">${tlOrder.map((id,k)=>`<button class="tlp ${tlSel===id?'sel':''}" data-act="tlTap" data-id="${id}" ${tlAttr(byId[id])} aria-label="第 ${k+1} 張">${num(k)}${k===0?'<i>最早</i>':k===n-1?'<i>最晚</i>':''}</button>`).join('')}</div>
-    <div class="muted" style="font-size:15px">${tlSel ? '已選一張，再點它要放的位置。' : '按住照片拖到正確的位置；也可以先點一張、再點要放的位置。'}</div>
+    <div class="muted" style="font-size:15px">${tlSel ? '已選一張，再點它要放的位置。' : '按住照片拖到正確的位置；也可以先點一張、再點要放的位置。想看清楚，先點一張再按「放大看」。'}</div>
+    ${tlSel ? `<button class="btn" data-act="tlZoom" data-id="${tlSel}" style="align-self:center">🔍 放大看這張</button>` : ''}
     <button class="big-btn" data-act="tlSubmit">${window._tlArm ? '確定送出（全組只能送一次）' : '排好了，代表全組送出'}</button>
     <button class="btn" data-act="tlClear" style="align-self:center">重新打亂</button></div>`;
 }
@@ -2504,6 +2505,10 @@ Object.assign(A, {
   tlTap(b){ if(Date.now() - tlDragEnd < 350) return; const id = b.dataset.id; // 點一張再點另一格：把第一張移到那一格
     if(!tlSel){ tlSel = id; render(); } else if(tlSel===id){ tlSel = null; render(); } else { const from = tlSel; tlSel = null; tlMove(from, id); } },
   tlClear(){ tlOrder = []; tlSel = null; window._tlArm = false; render(); },
+  tlZoom(b){ const ph = tlPhotos().find(x=>x.id===b.dataset.id); if(!ph) return; // 只放大照片本身，不顯示活動名稱和日期
+    const d = document.createElement('div'); d.className = 'lightbox';
+    d.innerHTML = `<div style="width:100%"><div ${ph.builtin?`data-tl="${ph.id}"`:''} style="width:100%;height:72vh;background-size:contain;background-repeat:no-repeat;background-position:center;${ph.builtin?'':`background-image:url(${ph.img});`}"></div><p>點任何地方關閉</p></div>`;
+    d.onclick = () => d.remove(); document.body.appendChild(d); },
   async tlSubmit(){ const gi = myPz(); const cap = gi>=0 && pzGroups()[gi].cap; if(gi<0 || (cap && cap!==ME) || ctrl().tl!=='running' || S().tdone[gi] || tlOrder.length!==tlPhotos().length) return;
     if(!window._tlArm){ window._tlArm = true; render(); return; }
     window._tlArm = false; await store.set('tdone', String(gi), {g:gi, order:[...tlOrder], at:Date.now(), by:ME}); party(); },
