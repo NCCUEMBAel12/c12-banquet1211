@@ -845,6 +845,7 @@ const ALL_ROUNDS = [ // 原則：要全組一起才成立；每個主題只出�
     '人體波浪：排成一列，從蹲到站再到蹲，定格成一道浪',
     '啦啦隊：前排蹲、後排站排成金字塔隊形（不用疊），全員同一個加油手勢'] },
   { title:'大隊合照', teams:3, level:'終極', color:'var(--yellow)',
+    together:{ names:['陳靜瑩','張家齊','于卓民','陳淑珠'], pose:'大愛心：全隊手牽手圍成一顆大愛心，把 LISA 會長、家齊會長、于老師和淑珠班媽圍在愛心正中間，四位在裡面比讚。攝影師站到椅子上從上往下拍，愛心的形狀要看得出來' }, // 這幾位固定排在同一隊，那一隊固定拿這一題
     how:['全場分成 3 大隊','全隊一起排出手機上指定的大隊形','三隊輪流幫彼此拍照上傳','最後一回合，前三名照樣加分'], must:[
     '打氣圈圈：全隊圍成一圈低頭看鏡頭，每人伸一隻手到中間比讚，手機放低從下往上拍，每張臉都要入鏡'],
   poses:[
@@ -1054,10 +1055,20 @@ function buildRound(r){
     gs = gs.concat(best||[]);
   });
   gs = shuffle(gs);
+  let tgIdx = -1; const tgIds = new Set();
+  if(R.together){ // 指定同隊：找出這幾位在哪一隊最多，其餘的人和那一隊的一般成員對調（各隊人數不變）
+    const want = ps.filter(p=>R.together.names.includes(p.name)).map(p=>p.id); want.forEach(id=>tgIds.add(id));
+    if(want.length && gs.length > 1){
+      const cnt = gs.map(g=>g.filter(id=>tgIds.has(id)).length); tgIdx = cnt.indexOf(Math.max(...cnt));
+      want.forEach(id=>{ const from = gs.findIndex(g=>g.includes(id)); if(from<0 || from===tgIdx) return;
+        const cand = gs[tgIdx].filter(o=>!tgIds.has(o)), out1 = cand.find(o=>!vip.has(o)) || cand[0]; if(!out1) return;
+        gs[tgIdx][gs[tgIdx].indexOf(out1)] = id; gs[from][gs[from].indexOf(id)] = out1; });
+    } else if(want.length) tgIdx = 0;
+  }
   const pool = [...shuffle(R.must||[]), ...shuffle(R.poses)]; // must 的題目先發，再從其他題目補足，最後打亂給各組
   const poses = R.items ? itemPoses(gs.length) : shuffle(pool.slice(0, gs.length)).concat(pool.slice(gs.length));
-  const out = gs.map((m,i)=>({ m, pose: poses[i % poses.length], cam: null }));
-  assignCams(out, vip, new Set(allGroups().flatMap((G,i)=> i===r ? [] : (G||[]).map(g=>g.cam).filter(Boolean))));
+  let pi = 0; const out = gs.map((m,i)=>({ m, pose: i===tgIdx ? R.together.pose : poses[pi++ % poses.length], cam: null }));
+  assignCams(out, new Set([...vip, ...tgIds]), new Set(allGroups().flatMap((G,i)=> i===r ? [] : (G||[]).map(g=>g.cam).filter(Boolean))));
   return out;
 }
 // 攝影師兩組兩組互換：第 1、2 組互拍，第 3、4 組互拍…；組數是單數時，最後三組輪流（A 拍 B、B 拍 C、C 拍 A）。每組只會被借走一個人
