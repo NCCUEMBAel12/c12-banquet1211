@@ -610,7 +610,7 @@ body.tri .pnav{position:sticky;bottom:-12px;margin:12px -12px -12px}
     </div>
     <div id="hMain" hidden style="display:flex;flex-direction:column;gap:14px">
       <button class="btn" id="hToPlayer" data-act="view" data-v="player" hidden style="align-self:flex-end;padding:6px 14px;font-size:14px">📱 切到我的玩家畫面</button>
-      <button id="hCount" data-act="hCount" style="align-self:flex-start;display:flex;align-items:baseline;gap:8px;padding:8px 16px;border:var(--bd);border-radius:999px;background:var(--yellow);box-shadow:var(--sh);font-family:var(--f-display);font-weight:900;cursor:pointer"></button>
+      <button id="hCount" data-act="hCount" style="align-self:flex-start;display:flex;align-items:center;gap:0;padding:8px 10px;border:var(--bd);border-radius:18px;background:var(--yellow);box-shadow:var(--sh);font-family:var(--f-display);font-weight:900;cursor:pointer"></button>
       <nav class="htabs" role="tablist">
         <button role="tab" data-act="htab" data-t="live" aria-selected="true">現場</button>
         <button role="tab" data-act="htab" data-t="checkin" aria-selected="false">報到</button>
@@ -1454,7 +1454,8 @@ function renderHost(){
   $('#hToPlayer').hidden = VIEW==='all' || !(ME && S().players[ME]);
   document.querySelectorAll('[data-htab]').forEach(d=> d.hidden = d.dataset.htab!==hTab);
   { const R = roster(), ps = players(), inR = R.filter(x=>ps.some(p=>p.name===x.name)).length; // 當下已報到人數，每個分頁都看得到；點一下跳到報到名單
-    setHTML($('#hCount'), `<span style="font-size:14px">已報到</span><span style="font-size:26px;line-height:1">${ps.length}</span><span style="font-size:14px">${R.length ? `/ ${R.length} 人・還有 ${R.length-inR} 人沒到` : '人'}</span>`); }
+    const gone = ps.filter(p=>p.gone).length, cell = (n,k,big) => `<span style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 ${big?14:10}px"><span style="font-size:${big?30:20}px;line-height:1">${n}</span><span style="font-size:12px">${k}</span></span>`, bar = '<span style="width:2px;align-self:stretch;background:var(--ink);opacity:.25"></span>';
+    setHTML($('#hCount'), cell(ps.length-gone,'現在在場',1) + bar + cell(ps.length,'已報到') + (R.length ? bar + cell(R.length-inR,'未到') : '') + bar + cell(gone,'已離席')); }
   document.querySelectorAll('.htabs [data-t]').forEach(b=>b.setAttribute('aria-selected', b.dataset.t===hTab));
   { const R = roster(), ps = players(); $('#hRosterN').textContent = R.length ? `（已匯入 ${R.length} 人，其中 ${R.filter(x=>ps.some(p=>p.name===x.name)).length} 人已報到）` : '（尚未匯入）'; }
   if(hTab==='checkin'){ $('#hQrScr').textContent = ctrl().qr ? '收起投影幕的報到畫面' : '在投影幕顯示報到畫面'; const q = $('#hQr'); $('#hJoinUrl').textContent = joinURL(); if(!q._done && window.QRCode){ q._done = true; new QRCode(q, {text:joinURL(), width:160, height:160, colorDark:'#1d1647', colorLight:'#ffffff'}); } else if(!window.QRCode && !q._done){ q.textContent = 'QR 載入中'; } }
