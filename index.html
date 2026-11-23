@@ -624,8 +624,8 @@ body.tri .pnav{position:sticky;bottom:-12px;margin:12px -12px -12px}
         <div class="card" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
           <div id="hQr" style="background:#fff;padding:10px;border:var(--bd);border-radius:14px;width:180px;height:180px;display:grid;place-items:center;flex:none"></div>
           <div style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 220px">
-            <b>報到 QR Code（工作人員出示給來賓掃）</b>
-            <div class="muted" style="font-size:14px">放在報到桌的平板或手機上，或印出來。投影幕預設不顯示；需要時按「在投影幕顯示報到畫面」，它會暫時蓋在目前那一頁上，再按一次收起，不影響遊戲進度。</div>
+            <b>遊戲 QR Code（備用）</b>
+            <div class="muted" style="font-size:14px">正式報到請來賓掃班聯會系統的簽到 QR Code，LINE 簽到後會自動帶名字進遊戲。這個遊戲 QR Code 是備用：給不在班聯會系統裡的來賓（小天使）、手機沒有 LINE、或中途跳出想回來的人掃，進來後點自己的名字。投影幕預設不顯示；需要時按「在投影幕顯示報到畫面」，它會暫時蓋在目前那一頁上，再按一次收起，不影響遊戲進度。</div>
             <div id="hJoinUrl" style="font-size:13px;word-break:break-all;user-select:all"></div>
             <div class="hrow"><button class="btn pri" data-act="qrBig">放大給來賓掃</button><button class="btn gold" id="hQrScr" data-act="qrScreen">在投影幕顯示報到畫面</button><button class="btn" data-act="copyJoin">複製報到網址</button><span id="hCopyMsg" class="okline" style="font-size:15px"></span></div>
           </div>
@@ -1370,7 +1370,7 @@ function renderHost(){
 }
 // 活動流程（rundown）：投影幕「活動流程」頁、手機和主持人頁都讀這一份。ph＝進行到哪些階段時把這一列標成「現在」；host＝只給主持人看的時間分配
 const RUNDOWN = [
-  {t:'18:00', e:'18:40', name:'報到入席・拾心意', note:'祝福彈幕・用手機送祝福上大螢幕', ph:['lobby'], host:'工作人員出示報到 QR Code，報到入席時發放伴手禮；投影幕停在祝福彈幕頁；前菜或冷盤先上桌'},
+  {t:'18:00', e:'18:40', name:'報到入席・拾心意', note:'祝福彈幕・用手機送祝福上大螢幕', ph:['lobby'], host:'報到桌放班聯會簽到 QR Code（LINE 簽到後自動跳進遊戲）＋遊戲 QR Code 立牌備用；小天使三位和中途跳出的人掃遊戲 QR 點名字；報到入席時發放伴手禮；投影幕停在祝福彈幕頁；前菜或冷盤先上桌'},
   {t:'18:40', e:'18:55', name:'開場・致詞', note:'來賓介紹 → 于總導師 → 淑珠班媽 → 桂妃班代', ph:['card:12','rundown','card:0','card:1','card:2','card:3'], host:'來賓介紹 3 分、于總導師致詞 5 分、淑珠班媽致詞 3 分、桂妃班代致詞 3 分；四段都在開動前講完'},
   {t:'18:55', e:'19:05', name:'開動用餐', note:'桌菜上菜', ph:['card:7'], host:'18:55 請餐廳出第一道熱菜；先讓大家吃 10 分鐘'},
   {t:'19:05', e:'19:15', name:'遊戲一：拾記憶', note:'快問快答・9 題（含 2 題 OX）・邊吃邊玩', ph:['quiz'], host:'說明 1 分；9 題每題約 1 分鐘（作答 10 秒＋公布與串場），節奏要快。不用離席，餐廳照常出菜'},
@@ -1525,8 +1525,8 @@ function hostLive(c){
 /* ══════════ 主持人講稿：照頁面對應，主持人畫面和提詞畫面（#cue）都會顯示 ══════════
    每一行：一般文字＝要念的稿；〔…〕＝控場提示；（…）＝給主持人看的備註；**粗體**＝一定要講到的重點 */
 const CUE = {
-  'lobby': ['（大家陸續進場時，每隔幾分鐘講一次。）','歡迎大家！請先入座。**拿出手機掃桌上的 QR code 報到**，輸入名字就可以了。','報到完，手機上可以留一句話給創12，**你的祝福會飛上大螢幕**。想說什麼都可以，越多越熱鬧。'],
-  'card:12': ['各位老師、各位貴賓、各位學長姐，大家晚安！歡迎來到創十二班聯會交接晚宴。','今天晚上的主題是一個字：「拾」。是十二的拾，也是撿起來的拾。**我們要一起把這一年的心意、記憶、夥伴、時光和笑容，一樣一樣撿回來。**','等一下有三個小遊戲，全部用手機玩，所以**手機請留在手邊、保持有電**。','（想帶大家看今晚流程時，按「投影幕臨時顯示：活動流程」，看完再收起來。）'],
+  'lobby': ['（大家陸續進場時，每隔幾分鐘講一次。）','歡迎大家！請先入座。還沒報到的，**用手機掃報到桌的班聯會簽到 QR code**，LINE 簽到完會自動跳進今晚的遊戲，名字會自己帶進去，不用再輸入。','如果中途跳出去了，或是手機沒有 LINE，**掃投影幕或報到桌上的遊戲 QR code，點自己的名字**就回來了。','報到完，手機上可以留一句話給創12，**你的祝福會飛上大螢幕**。想說什麼都可以，越多越熱鬧。'],
+  'card:12': ['各位老師、各位貴賓、各位學長姐，大家晚安！歡迎來到創十二班聯會交接晚宴。','今天晚上的主題是一個字：「拾」。是十二的拾，也是撿起來的拾。**我們要一起把這一年的心意、記憶、夥伴、時光和笑容，一樣一樣撿回來。**','等一下有三個小遊戲，全部用手機玩，所以**手機請留在手邊、保持有電**。','還沒進到遊戲畫面的，現在補一下：**LINE 簽到完會自動跳進遊戲；跳出來的人掃投影幕的 QR code、點自己的名字**。','（想帶大家看今晚流程時，按「投影幕臨時顯示：活動流程」，看完再收起來。）'],
   'rd': ['（活動流程・備用頁）今晚的流程在大螢幕上，大家可以看一下時間安排。'],
   'card:0': ['首先，讓我們用最熱烈的掌聲，歡迎今晚特地到場的貴賓。','（照投影幕上的名單逐一介紹：頭銜、姓名，每位念完停一下讓大家鼓掌。）','謝謝各位貴賓，有你們在，今晚特別有意義。'],
   'card:1': ['上課那一年，有一位老師一路看著我們、帶著我們。讓我們掌聲歡迎**于總導師**。','（致詞後）謝謝老師，每次聽您說話，都像又回到教室。'],
@@ -1781,8 +1781,8 @@ document.addEventListener('keydown', e=>{
 });
 function screenCheckin(){ // 選用的報到畫面：需要時才叫出來，蓋在目前頁面上，不影響手機和流程
   const ps = players();
-  return `<div class="s-head"><h1 class="s-title">創12 班聯會<span class="s-gold">交接晚宴</span></h1><span class="s-sub">手機掃碼報到，馬上送一句祝福上大螢幕</span></div>
-    <div class="lobby"><div class="qrbox"><div id="qr"></div><b>掃我報到</b><small>${esc(joinURL())}</small></div>
+  return `<div class="s-head"><h1 class="s-title">創12 班聯會<span class="s-gold">交接晚宴</span></h1><span class="s-sub">LINE 簽到後會自動進來；跳出來的人掃這裡、點自己的名字</span></div>
+    <div class="lobby"><div class="qrbox"><div id="qr"></div><b>掃我進遊戲</b><small>${esc(joinURL())}</small></div>
       <div style="display:flex;flex-direction:column;gap:2cqh;min-width:0"><div><span class="s-big">${ps.length}</span> <span class="s-sub">人已報到</span></div>
       <div class="namecloud">${ps.slice(-60).map(p=>`<span class="${isVip(p)?'vip':''}">${esc(p.name)}</span>`).join('')}</div></div></div>`;
 }
