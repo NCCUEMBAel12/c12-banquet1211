@@ -799,12 +799,11 @@ const PA = (()=>{
     '手臂星星': () => { const cx=200, cy=146, n=5; let b='';
       for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, tx=cx+Math.cos(a)*150, ty=cy+Math.sin(a)*120; [-1,1].forEach(d=>{ const ba=a+d*.42; b += seg(cx+Math.cos(ba)*58, cy+Math.sin(ba)*50, tx, ty, C(k), 9); }); b += hand(tx,ty,7); }
       const F=[[200,112],[166,130],[234,130],[181,170],[219,170]]; F.forEach((f,i)=> b += `<ellipse cx="${f[0]}" cy="${f[1]+21}" rx="18" ry="11" fill="${C([0,4,1,3,2][i])}" stroke="${INK}" stroke-width="2.5"/>`); F.forEach(f=> b += face(f[0],f[1],18)); return b; },
-    '手臂大星星': () => { const cx=200, cy=142, n=8; let b=''; // 每人兩隻手臂伸直、指尖相碰＝星星的一個角
-      for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, ca=Math.cos(a), sa=Math.sin(a), fx=cx+ca*66, fy=cy+sa*56, tx=cx+ca*172, ty=cy+sa*122, px=-sa, py=ca;
-        b += `<ellipse cx="${P(fx)}" cy="${P(fy)}" rx="21" ry="21" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>`;
-        [-1,1].forEach(d=> b += seg(fx+px*d*17+ca*6, fy+py*d*17+sa*6, tx+px*d*4, ty+py*d*4, C(k), 7));
-        [-1,1].forEach(d=> b += hand(tx+px*d*5, ty+py*d*5, 5.5));
-        b += face(fx,fy,15); }
+    '手臂大星星': () => { const cx=200, cy=142, n=8; let b=''; // 每人兩手張開，左右手各碰鄰居的手＝星星的一個角
+      const pos = k => { const a=-Math.PI/2+(k+.5)*TAU/n; return [a, cx+Math.cos(a)*62, cy+Math.sin(a)*52]; };
+      for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k);
+        [-1,1].forEach(d=>{ const ta=a+d*TAU/n/2, tx=cx+Math.cos(ta)*168, ty=cy+Math.sin(ta)*122, px=-Math.sin(ta), py=Math.cos(ta); b += seg(fx,fy,tx-px*d*4,ty-py*d*4,C(k),7) + hand(tx-px*d*5,ty-py*d*5,5.5); }); }
+      for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k); b += `<circle cx="${P(fx)}" cy="${P(fy)}" r="20" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + face(fx,fy,15); }
       return b; },
     '手掌太陽': () => palms(8, 22, 20),
     '用手臂比字': () => { const S=[[[120,50],[120,91]],[[120,91],[120,132]],[[120,132],[120,173]],[[120,173],[120,214]], [[232,60],[316,60]],[[316,60],[316,134]],[[316,134],[232,214]],[[232,214],[320,214]]];
@@ -855,7 +854,7 @@ const ALL_ROUNDS = [ // 原則：要全組一起才成立；每個主題只出�
     how:['約 5 人一組，每組抽到一樣不同的物品','先在現場把那樣東西找出來','全組和它一起演出手機上指定的畫面','隔壁組的攝影師幫你們拍照上傳（兩組先後拍）'], poses:[] }, // 題目由 ITEMS × ITEM_PLAYS 產生，每組物品都不同
   { title:'挑戰合照', size:8, level:'困難', color:'var(--orange)',
     how:['約 8 人一組，題目難度升級','用手臂和隊形一起拼出指定的畫面','每一個人都要入鏡才算數','隔壁組的攝影師幫你們拍照上傳（兩組先後拍）'], must:[
-    '手臂大星星：每人雙手伸直、指尖相碰當星星的一個角，前排蹲的角朝下、後排站的角朝上和兩旁，全組擠在一起拼出一顆大星星',
+    '手臂大星星：八人擠在一起，每人兩手張開伸直，左手碰左邊鄰居的手、右手碰右邊鄰居的手，兩隻手相碰就是星星的一個角，拼出一顆八角大星星。前排可以蹲低、後排站高，八張臉都要入鏡',
     '指尖星星：圍成一圈低頭，每人伸一隻手比 YA，八個 YA 指尖相接拼成一顆大星星，手機放低從下往上拍，八顆頭都要圍在星星外圈露出來',
     '千手觀音：排成一直線，十六隻手一隻都不能重疊',
     '十二地支：八人各演一種生肖動物，不能重複，要讓看照片的人猜得出來',
