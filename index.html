@@ -1150,7 +1150,7 @@ addEventListener('resize', setPvh); document.addEventListener('fullscreenchange'
 function route(){
   const h = location.hash.replace('#','');
   if(h.startsWith('u-')) pendingCode = h.slice(2);
-  if(h.startsWith('n-')){ try{ const n = decodeURIComponent(h.slice(2)).trim(); if(n) pendingCode = ucode(n); }catch(e){} } // 班聯會系統簽到後帶姓名過來：#n-姓名
+  if(h.startsWith('n-')){ try{ const n = decodeURIComponent(h.slice(2)).trim(); if(n){ pendingCode = ucode(n); LS.set('c12signin','1'); } }catch(e){} } // 班聯會系統簽到後帶姓名過來：#n-姓名
   VIEW = h==='cards' ? 'cards' : h==='host' ? 'host' : h==='screen' ? 'screen' : h==='cue' ? 'cue' : h==='all' ? 'all' : (!h && PREVIEW && innerWidth>=1100) ? 'all' : 'player'; // 電腦上的預覽預設三畫面並排
   document.body.classList.toggle('tri', VIEW==='all'); { const ba = $('#pvAll'); if(ba) ba.setAttribute('aria-pressed', VIEW==='all'); }
   $('#viewCards').hidden = VIEW!=='cards'; if(VIEW==='cards') document.body.classList.remove('tri');
