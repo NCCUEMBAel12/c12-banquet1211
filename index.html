@@ -748,7 +748,29 @@ const PA = (()=>{
     return b + `<circle cx="${cx}" cy="${cy}" r="${core-3}" fill="#ffc928" stroke="${INK}" stroke-width="3"/>`; }
   const poly = (pts, w=11) => pts.slice(0,-1).map((p,i)=>seg(p[0],p[1],pts[i+1][0],pts[i+1][1],C(i),w)).join('') + pts.map(p=>hand(p[0],p[1],6)).join('');
   const D = {
-    '指尖星星': () => yaRing(5,104,60,25,24),
+    '指尖星星': () => yaRing(8,108,56,30,17),
+    '十二地支': () => { const y=250, h=104; let b=ground(y);
+      const ear = { // 每種生肖畫在頭上的特徵（cx、頭頂 cy、頭半徑 r）
+        '鼠': (x,t,r)=> [-1,1].map(k=>`<circle cx="${P(x+k*r*.85)}" cy="${P(t+r*.2)}" r="${P(r*.55)}" fill="#cfc8e8" stroke="${INK}" stroke-width="2.2"/>`).join(''),
+        '牛': (x,t,r)=> [-1,1].map(k=>`<path d="M${P(x+k*r*.6)} ${P(t+r*.35)} Q${P(x+k*r*1.7)} ${P(t+r*.2)} ${P(x+k*r*1.5)} ${P(t-r*.75)}" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${P(x+k*r*.6)} ${P(t+r*.35)} Q${P(x+k*r*1.7)} ${P(t+r*.2)} ${P(x+k*r*1.5)} ${P(t-r*.75)}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join(''),
+        '虎': (x,t,r)=> [-1,1].map(k=>`<path d="M${P(x+k*r*.3)} ${P(t+r*.25)} L${P(x+k*r*.95)} ${P(t-r*.45)} L${P(x+k*r*1.05)} ${P(t+r*.6)} Z" fill="#ff8a3d" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`).join(''),
+        '兔': (x,t,r)=> [-1,1].map(k=>`<ellipse cx="${P(x+k*r*.5)}" cy="${P(t-r*.75)}" rx="${P(r*.33)}" ry="${P(r*1.05)}" transform="rotate(${k*10} ${P(x+k*r*.5)} ${P(t-r*.75)})" fill="#fff" stroke="${INK}" stroke-width="2.2"/>`).join(''),
+        '龍': (x,t,r)=> [-1,1].map(k=>`<path d="M${P(x+k*r*.4)} ${P(t+r*.3)} L${P(x+k*r*.7)} ${P(t-r*.9)} M${P(x+k*r*.58)} ${P(t-r*.35)} L${P(x+k*r*1.25)} ${P(t-r*.7)}" fill="none" stroke="#19b5a5" stroke-width="4.5" stroke-linecap="round"/>`).join(''),
+        '蛇': ()=> '', '馬': (x,t,r)=> [-1,1].map(k=>`<path d="M${P(x+k*r*.35)} ${P(t+r*.3)} L${P(x+k*r*.7)} ${P(t-r*.75)} L${P(x+k*r*.95)} ${P(t+r*.5)} Z" fill="#b98455" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`).join(''),
+        '羊': (x,t,r)=> [-1,1].map(k=>`<path d="M${P(x+k*r*.7)} ${P(t+r*.3)} q${P(k*r*.9)} ${P(-r*.3)} ${P(k*r*.8)} ${P(r*.6)} q${P(-k*r*.1)} ${P(r*.55)} ${P(-k*r*.5)} ${P(r*.2)}" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><path d="M${P(x+k*r*.7)} ${P(t+r*.3)} q${P(k*r*.9)} ${P(-r*.3)} ${P(k*r*.8)} ${P(r*.6)} q${P(-k*r*.1)} ${P(r*.55)} ${P(-k*r*.5)} ${P(r*.2)}" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`).join('') };
+      const arms = [[[-.1,.02],[.1,.02]], [[-.2,-.12],[.2,-.12]], [[-.18,-.02],[.18,-.2]], [[-.06,.04],[.06,.04]], [[-.22,-.2],[.22,-.2]], [[.02,-.3],[.06,-.3]], [[-.16,.16],[.2,.0]], [[-.12,.2],[.12,.2]]];
+      ['鼠','牛','虎','兔','龍','蛇','馬','羊'].forEach((t,i)=>{ const x=46+i*44, r=h*.15, hy=y-h+r, top=hy-r;
+        b += (ear[t]||(()=>''))(x,top,r) + fig(x,y,h,C(i),arms[i]);
+        if(t==='蛇') b += `<path d="M${P(x)} ${P(hy+r*.55)} v9 m0 0 l-4 5 m4 -5 l4 5" fill="none" stroke="#e85d5d" stroke-width="2.5" stroke-linecap="round"/>`;
+        if(t==='虎') b += `<path d="M${P(x-5)} ${P(top+4)} v6 M${P(x)} ${P(top+3)} v7 M${P(x+5)} ${P(top+4)} v6" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`;
+        b += `<circle cx="${x}" cy="${top-50}" r="15" fill="#fff" stroke="${INK}" stroke-width="2.5"/>` + txt(x, top-44, t, 17); });
+      return b + txt(200, 274, '八個人、八種生肖，不能重複', 13); },
+    '龜派氣功波': () => { const y=250; let b=ground(y);
+      b += `<path d="M112 172 H372" stroke="#3aa0ff" stroke-width="20" stroke-linecap="round" opacity=".22"/><path d="M112 172 H372" stroke="#3aa0ff" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round" opacity=".7"/>`;
+      [6,5,4,3,2,1,0].forEach(i=>{ const x=160+i*28; b += fig(x,y,88,C(i+1),[[-.2,-.3],[.24,-.3]],{rot:10+i*3, mood:'o'}); });
+      b += fig(58,y,118,C(0),[[104,166],[104,180]],{abs:1});
+      b += `<circle cx="116" cy="172" r="19" fill="#ffc928" stroke="${INK}" stroke-width="3"/><circle cx="116" cy="172" r="9" fill="#fff"/>`;
+      return b + txt(72, 44, '發功！', 19) + txt(280, 44, '七人同時往後彈', 15); },
     '手拼愛心': () => { let b=''; const pts=[]; for(let i=0;i<=100;i++){ const t=i/100*TAU; pts.push([200+16*Math.pow(Math.sin(t),3)*6.2, 136-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*6.2]); }
       [[150,106],[250,106],[200,136],[165,171],[235,171]].forEach((f,i)=> b += `<ellipse cx="${f[0]}" cy="${f[1]+30}" rx="24" ry="20" fill="${C(i)}" stroke="${INK}" stroke-width="3"/>` + face(f[0],f[1],21));
       const d = k => pts.slice(k*20,k*20+21).map((p,i)=>(i?'L':'M')+P(p[0])+' '+P(p[1])).join(' ');
