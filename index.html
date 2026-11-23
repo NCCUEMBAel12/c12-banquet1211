@@ -1594,7 +1594,7 @@ function jumpBar(P, i){ // 跳頁列：上排是整晚的段落，點一段展�
   const cur = segOf[i], open = cur; // 下排永遠是「目前這一段」的每一頁
   window._segOf = segOf;
   const lab = pg => pg.k==='q' ? `Q${pg.i+1}` : pg.k==='qr' ? `答${pg.i+1}` : pg.t;
-  return `<div class="jump"><div class="jseg">${RUNDOWN.map((x,k)=> segOf.includes(k) ? `<button class="${k===cur?'now':''} ${k===open?'open':''}" data-act="segJump" data-i="${k}"><span class="num">${x.t}</span>${esc(x.name.split(/[・：＋]/)[0])}</button>` : '').join('')}</div>
+  return `<div class="jump"><div class="jseg">${RUNDOWN.map((x,k)=> segOf.includes(k) ? `<button class="${k===cur?'now':''} ${k===open?'open':''}" data-act="segJump" data-i="${k}"><span class="num">${x.t}</span>${x.ph.includes('quiz')?'R1 ':x.ph.includes('puzzle')?'R2 ':x.ph.includes('photo')?'R3 ':''}${esc(x.name.split(/[・：＋]/)[0])}</button>` : '').join('')}</div>
     <div class="jpages"><span class="jlab">這一段</span>${P.map((pg,k)=> segOf[k]===open ? `<button class="${k===i?'now':''}" data-act="pgJump" data-i="${k}">${esc(lab(pg))}</button>` : '').join('')}</div></div>`;
 }
 function hostLive(c){
