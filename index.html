@@ -1728,14 +1728,18 @@ function hostPhoto(c){
     const gs = allGroups()[r]||[], ranks = photoRanks(r);
     grid = `<div class="ggrid">${gs.map((g,i)=>{ const up=S().uploads[`${r}_${i}`], ri=ranks.findIndex(u=>u.g===i);
       return `<div class="gcard"><div class="top"><span class="gdot" style="background:${gColor(i)}">${i+1}</span><span class="muted" style="font-size:13px">${g.m.length} 人</span><span class="gstat ${up?'ok':'wait'}">${up?`✓ 第 ${ri+1} 名`:'未上傳'}</span></div>
-        <div style="font-weight:700">${esc(g.pose)}</div><div class="muted" style="font-size:13px">${g.m.map(pname).map(esc).join('、')}</div><div style="font-size:13px;font-weight:700">📷 攝影師：${esc(pname(g.cam))}${up?'':camWait(gs,i)<0?'・① 先拍':camReady(gs,i,r)?'・② 輪到了':`・② 等第 ${camWait(gs,i)+1} 組`}</div>${up?`<img src="${up.img}" alt="">`:''}</div>`; }).join('')}</div>`;
+        <div style="font-weight:700">${esc(g.pose)}</div>${!up && PA(g.pose) ? `<div style="max-width:230px;margin:6px auto 2px">${PA(g.pose)}</div>` : ''}<div class="muted" style="font-size:13px">${g.m.map(pname).map(esc).join('、')}</div><div style="font-size:13px;font-weight:700">📷 攝影師：${esc(pname(g.cam))}${up?'':camWait(gs,i)<0?'・① 先拍':camReady(gs,i,r)?'・② 輪到了':`・② 等第 ${camWait(gs,i)+1} 組`}</div>${up?`<img src="${up.img}" alt="">`:''}</div>`; }).join('')}</div>`;
   }
   return `<div style="display:flex;flex-direction:column;gap:14px">
     <div class="card"><b>回合規劃（依目前 ${n} 人自動計算）</b><div class="tbl-wrap"><table><thead><tr><th></th><th>回合</th><th>難度</th><th>男女</th><th>組數</th><th>人數分配</th></tr></thead><tbody>${plan}</tbody></table></div>
       <div class="muted" style="font-size:14px;margin-top:6px">每回合流程：預告（投影幕說明玩法）→ 開始分組（投影幕即時顯示各組照片）→ 結束回合（投影幕顯示前三名）。「男女」欄可以在回合開始前點一下切換（需要名冊有性別）。有名冊時，原本同「組別」的人會盡量拆到不同組；攝影師兩組兩組互換（第 1、2 組互拍，第 3、4 組互拍…，單數時最後三組輪流），而且先後拍：號碼小的組先拍，前一組上傳後下一組才輪到，照片都是全組到齊；人選從對方組裡隨機抽，拍照上傳加 50 分；晚到的人會自動補進人數最少的組；老師、輔導員、班媽、來賓會盡量分散，同一回合不和前幾回合的同組夥伴重複。</div></div>
     <div class="hrow">${r>=0?`<b>第 ${r+1} 回合・${c.roundState==='chat'?'聊近況中':running?'進行中':'已結束'}・完成 ${photoRanks(r).length}/${(allGroups()[r]||[]).length} 組${Object.keys(teamMap()).length?`・原同組被分在一起 ${sameTeamPairs(r)} 對`:''}</b>`:'<b>尚未開始</b>'} ${ctl}</div>
     <div class="hrow"><button class="btn" data-act="saveAll" ${Object.keys(S().uploads).length?'':'disabled'}>⬇ 下載全部合照（${Object.keys(S().uploads).length} 張）</button><span class="muted" style="font-size:14px">${window._dl || (PREVIEW ? '預覽頁面會擋下載，正式網址才有作用' : '活動結束後按一次，打包成一個壓縮檔')}</span></div>
-    ${grid}</div>`;
+    ${grid}
+    <details class="card"><summary style="cursor:pointer;font-weight:900">題目與示意圖一覽（點開查看三回合所有題目）</summary>
+      ${ROUNDS.map((R,ri)=>{ const item = (t,tag) => `<div style="border:2px solid var(--ink);border-radius:14px;padding:8px;background:#fff"><div style="font-size:12px;font-weight:900;color:var(--muted)">${tag}</div>${PA(t)||'<div class="muted" style="font-size:13px;padding:18px 0;text-align:center">（純文字題，沒有示意圖）</div>'}<div style="font-size:13px;font-weight:700;margin-top:4px">${esc(t)}</div></div>`;
+        return `<div style="font-weight:900;margin:14px 0 6px">R${ri+1}・${esc(R.title)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">${[...(R.together?[item(R.together.pose,'固定・指定隊伍')]:[]), ...(R.must||[]).map(t=>item(t,'優先題')), ...R.poses.map(t=>item(t,'備選'))].join('')}</div>`; }).join('')}
+    </details></div>`;
 }
 function hostQuiz(c){
   const q = c.quiz, B = bank(), np = players().length;
