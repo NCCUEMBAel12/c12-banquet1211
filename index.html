@@ -796,9 +796,12 @@ const PA = (()=>{
         b += `<path d="M${P(sx+dx/d*74)} ${P(sh+dy/d*74)} L${P(sx+dx/d*(d-16))} ${P(sh+dy/d*(d-16))}" stroke="${INK}" stroke-width="2.5" stroke-dasharray="4 6" opacity=".4"/>` + fig(x,y,h,C(i), L ? [rest,[hx,hy]] : [[hx,hy],rest], {abs:1, mood:'o'}); }); return b; },
     '六隻腳': () => { const y=250; let b=ground(y), n=0; [72,136,200,264,328].forEach((x,i)=>{ const two=i===2; b += fig(x,y,132,C(i),[i?[-.22,.03]:[-.14,.2], i<4?[.22,.03]:[.14,.2]],{one:!two});
         (two?[x-13,x+13]:[x-5]).forEach(fx=> b += `<circle cx="${fx}" cy="${y+15}" r="10" fill="${INK}"/>` + txt(fx,y+20,++n,13,'#fff')); }); return b; },
-    '手臂星星': () => { const cx=200, cy=146, n=5; let b='';
-      for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, tx=cx+Math.cos(a)*150, ty=cy+Math.sin(a)*120; [-1,1].forEach(d=>{ const ba=a+d*.42; b += seg(cx+Math.cos(ba)*58, cy+Math.sin(ba)*50, tx, ty, C(k), 9); }); b += hand(tx,ty,7); }
-      const F=[[200,112],[166,130],[234,130],[181,170],[219,170]]; F.forEach((f,i)=> b += `<ellipse cx="${f[0]}" cy="${f[1]+21}" rx="18" ry="11" fill="${C([0,4,1,3,2][i])}" stroke="${INK}" stroke-width="2.5"/>`); F.forEach(f=> b += face(f[0],f[1],18)); return b; },
+    '手臂星星': () => { const cx=200, cy=146, n=5; let b=''; // 每人兩手張開，左右手各碰鄰居的手＝星星的一個角
+      const pos = k => { const a=-Math.PI/2+(k+.5)*TAU/n; return [a, cx+Math.cos(a)*50, cy+Math.sin(a)*44]; };
+      for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k);
+        [-1,1].forEach(d=>{ const ta=a+d*TAU/n/2, tx=cx+Math.cos(ta)*160, ty=cy+Math.sin(ta)*124, px=-Math.sin(ta), py=Math.cos(ta); b += seg(fx,fy,tx-px*d*5,ty-py*d*5,C(k),9) + hand(tx-px*d*6,ty-py*d*6,7); }); }
+      for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k); b += `<circle cx="${P(fx)}" cy="${P(fy)}" r="24" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + face(fx,fy,18); }
+      return b; },
     '手臂大星星': () => { const cx=200, cy=142, n=8; let b=''; // 每人兩手張開，左右手各碰鄰居的手＝星星的一個角
       const pos = k => { const a=-Math.PI/2+(k+.5)*TAU/n; return [a, cx+Math.cos(a)*62, cy+Math.sin(a)*52]; };
       for(let k=0;k<n;k++){ const [a,fx,fy]=pos(k);
@@ -848,7 +851,7 @@ const ALL_ROUNDS = [ // 原則：要全組一起才成立；每個主題只出�
     'KTV 歡唱：兩人拿湯匙當麥克風深情對唱，其他三人伴舞'],
   poses:[
     '手勢接龍：排成一列，每人用手比一個符號，合起來是「1・2・愛心・讚・YA」',
-    '手臂星星：每人雙手伸直、指尖相碰當星星的一個角，兩人蹲前面角朝下、三人站後面角朝上和兩旁，拼出一顆五角星',
+    '手臂星星：五人擠在一起，每人兩手張開伸直，左手碰左邊鄰居的手、右手碰右邊鄰居的手，兩隻手相碰就是星星的一個角，拼出一顆五角星，五張臉都要入鏡',
     '搶買單：兩人搶著付帳、一人假裝找不到錢包、一人早就默默刷好卡、一人當看傻的店員'] },
   { title:'指定物品合照', size:5, level:'中等', items:true, hidden:true, color:'var(--teal)', // hidden:true＝這一回合先隱藏；拿掉 hidden 就恢復
     how:['約 5 人一組，每組抽到一樣不同的物品','先在現場把那樣東西找出來','全組和它一起演出手機上指定的畫面','隔壁組的攝影師幫你們拍照上傳（兩組先後拍）'], poses:[] }, // 題目由 ITEMS × ITEM_PLAYS 產生，每組物品都不同
