@@ -733,11 +733,13 @@ const PA = (()=>{
   }
   const top = (x,y,c,r=11) => `<ellipse cx="${P(x)}" cy="${P(y)}" rx="${P(r*1.5)}" ry="${P(r)}" fill="${c}" stroke="${INK}" stroke-width="2.5"/><circle cx="${P(x)}" cy="${P(y)}" r="${P(r*.72)}" fill="${SK}" stroke="${INK}" stroke-width="2.2"/>`;
   // 從下往上拍：n 個人圍一圈，每人一隻手比 YA，指尖相接
-  function yaRing(n, FR, R, r, fr, cy=142){ let b=''; const cx=200;
-    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, fx=cx+Math.cos(a)*FR*1.12, fy=cy+Math.sin(a)*FR, hx=cx+Math.cos(a)*R*1.08, hy=cy+Math.sin(a)*R;
-      b += seg(fx,fy,hx,hy,C(k),n>6?6:10);
-      [-1,1].forEach(d=>{ const ia=a+d*Math.PI/n, ix=cx+Math.cos(ia)*r*1.08, iy=cy+Math.sin(ia)*r; b += seg(hx,hy,ix,iy,SK,n>6?3.5:6).replace(/stroke-width="(\d+\.?\d*)"/, (m,v)=>`stroke-width="${n>6?7.5:11}"`); });
-      b += hand(hx,hy,n>6?5:8) + face(fx,fy,fr); }
+  function yaRing(n, FR, R, r, fr, cy=142){ let b=''; const cx=200, m=n*2; // 每人兩隻手都比 YA：2n 個 YA 指尖相接
+    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, fx=cx+Math.cos(a)*FR*1.12, fy=cy+Math.sin(a)*FR;
+      [-.5,.5].forEach(d=>{ const ha=a+d*TAU/m, hx=cx+Math.cos(ha)*R*1.08, hy=cy+Math.sin(ha)*R;
+        b += seg(fx,fy,hx,hy,C(k),6);
+        [-1,1].forEach(e=>{ const ia=ha+e*Math.PI/m, ix=cx+Math.cos(ia)*r*1.08, iy=cy+Math.sin(ia)*r; b += seg(hx,hy,ix,iy,SK,3).replace(/stroke-width="(\d+\.?\d*)"/, ()=>`stroke-width="6.5"`); });
+        b += hand(hx,hy,4.5); }); }
+    for(let k=0;k<n;k++){ const a=-Math.PI/2+k*TAU/n, fx=cx+Math.cos(a)*FR*1.12, fy=cy+Math.sin(a)*FR; b += `<circle cx="${P(fx)}" cy="${P(fy)}" r="${P(fr+5)}" fill="${C(k)}" stroke="${INK}" stroke-width="2.5"/>` + face(fx,fy,fr); }
     return b; }
   // 從下往上拍：n 個人圍一圈，2n 隻手掌向中間張開
   function palms(n, ry, core){ let b=''; const cx=200, cy=142, m=n*2;
@@ -748,7 +750,7 @@ const PA = (()=>{
     return b + `<circle cx="${cx}" cy="${cy}" r="${core-3}" fill="#ffc928" stroke="${INK}" stroke-width="3"/>`; }
   const poly = (pts, w=11) => pts.slice(0,-1).map((p,i)=>seg(p[0],p[1],pts[i+1][0],pts[i+1][1],C(i),w)).join('') + pts.map(p=>hand(p[0],p[1],6)).join('');
   const D = {
-    '指尖星星': () => yaRing(8,108,56,30,17),
+    '指尖星星': () => yaRing(8,106,62,40,15),
     '十二地支': () => { const y=250, h=104; let b=ground(y);
       const ear = { // 每種生肖畫在頭上的特徵（cx、頭頂 cy、頭半徑 r）
         '鼠': (x,t,r)=> [-1,1].map(k=>`<circle cx="${P(x+k*r*.85)}" cy="${P(t+r*.2)}" r="${P(r*.55)}" fill="#cfc8e8" stroke="${INK}" stroke-width="2.2"/>`).join(''),
@@ -907,7 +909,7 @@ const ALL_ROUNDS = [ // 原則：要全組一起才成立；每個主題只出�
   { title:'挑戰合照', size:8, level:'困難', color:'var(--orange)',
     how:['約 8 人一組，題目難度升級','用手臂和隊形一起拼出指定的畫面','每一個人都要入鏡才算數','隔壁組的攝影師幫你們拍照上傳（兩組先後拍）'], must:[
     '手臂大星星：八人擠在一起，每人兩手張開伸直，左手碰左邊鄰居的手、右手碰右邊鄰居的手，兩隻手相碰就是星星的一個角，拼出一顆八角大星星。前排可以蹲低、後排站高，八張臉都要入鏡',
-    '指尖星星：圍成一圈低頭，每人伸一隻手比 YA，八個 YA 指尖相接拼成一顆大星星，手機放低從下往上拍，八顆頭都要圍在星星外圈露出來',
+    '指尖星星：圍成一圈低頭，每人兩隻手都伸出來比 YA，十六個 YA 指尖相接拼成一顆大星星，手機放低從下往上拍，八顆頭都要圍在星星外圈露出來',
     '千手觀音：排成一直線，十六隻手一隻都不能重疊',
     '十二地支：八人各演一種生肖動物，不能重複，要讓看照片的人猜得出來',
     '龜派氣功波：一人在最前面發功，其他七人同時往後跳開、雙腳離地，像被震飛，攝影師抓拍騰空那一瞬間（連拍比較容易成功）',
