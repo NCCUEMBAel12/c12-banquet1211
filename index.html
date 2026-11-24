@@ -2000,7 +2000,7 @@ function screenBless(c){
     <div class="bless-foot"><div><span class="s-big num" id="blN">0</span> <span class="s-sub">則祝福</span></div></div>`;
 }
 /* ───── 拾福袋：第 4–12 名依序選號，選到才公布禮物 ───── */
-const GIFT_DEFAULT = ['養生茶一打（桂圓紅棗枸杞）','精釀啤酒一打','暖暖包一打','TODAY NUT 綜合堅果禮盒','衛生紙一打','BACHA 濾掛咖啡禮盒','護手霜一打','高爾夫球一打','濕紙巾一打'];
+const GIFT_DEFAULT = ['茶 12 包','精釀啤酒 12 罐','暖暖包 12 包','綜合堅果 12 包','衛生紙 12 包','濾掛咖啡 12 包','護手霜 12 條','高爾夫球一盒','濕紙巾 12 包'];
 const luckyGifts = c => { const g = (c||ctrl()).gifts; return Array.isArray(g) && g.length ? g : GIFT_DEFAULT; };
 const luckySeq = c => ((c||ctrl()).gseq || []).filter(n=> n>=1 && n<=luckyGifts(c).length);
 const luckyList = () => ranking().slice(3, 3+luckyGifts().length).map((x,i)=>({...x, rank:i+4})); // 選號順序：第 4 名先選；同分時照排行榜上的先後，名次直接用順位
