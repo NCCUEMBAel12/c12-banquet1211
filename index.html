@@ -2006,12 +2006,19 @@ const luckySeq = c => ((c||ctrl()).gseq || []).filter(n=> n>=1 && n<=luckyGifts(
 const luckyList = () => ranking().slice(3, 3+luckyGifts().length).map((x,i)=>({...x, rank:i+4})); // 選號順序：第 4 名先選；同分時照排行榜上的先後，名次直接用順位
 function screenLucky(c){
   const G = luckyGifts(c), seq = luckySeq(c), L = luckyList(), nxt = L[seq.length], last = seq[seq.length-1];
-  const cols = G.length<=6 ? 3 : G.length<=9 ? 3 : 4;
+  const side = L.map((x,i)=>{ const done = i<seq.length, cur = i===seq.length;
+    return `<li style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.8cqw;flex:1;min-height:0;padding:0 1cqw;border:.25cqw solid var(--ink);border-radius:1.2cqw;background:${cur?'var(--yellow)':'#fff'};color:var(--ink);opacity:${done?.55:1};${cur?'box-shadow:.35cqw .35cqw 0 var(--ink);':''}">
+      <span style="font-family:var(--f-num);font-weight:700;font-size:${cur?2.2:1.8}cqw">${x.rank}</span>
+      <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-display);font-weight:900;font-size:${cur?2.4:1.9}cqw">${esc(x.name)}</span>
+      <span style="font-weight:900;font-size:1.4cqw;white-space:nowrap">${done?`${seq[i]} 號`:cur?'選號中':''}</span></li>`; }).join('');
   return `<div class="s-head"><h1 class="s-title">拾<span class="s-gold">福袋</span></h1><span class="s-sub">${nxt ? `輪到 第 ${nxt.rank} 名・<b style="color:var(--yellow);font-size:1.5em">${esc(nxt.name)}</b>　請選一個號碼` : seq.length ? '九個福袋都有主人了！' : '第 4～12 名依序選號，打開才知道'}</span></div>
-    <div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(${cols},minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:1.6cqw">${G.map((g,i)=>{ const n=i+1, k=seq.indexOf(n), who=k>=0?L[k]:null, open=k>=0;
-      return `<div style="border:.3cqw solid var(--ink);border-radius:1.8cqw;box-shadow:.4cqw .4cqw 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqh;padding:1cqh 1cqw;min-height:0;overflow:hidden;text-align:center;background:${open?(n===last?'var(--yellow)':'#fff'):'var(--pink)'};color:${open?'var(--ink)':'#fff'}">
-        ${open ? `<div style="font-family:var(--f-num);font-weight:700;font-size:1.8cqw;opacity:.6">${n} 號</div><div style="font-family:var(--f-display);font-weight:900;font-size:${n===last?3.1:2.5}cqw;line-height:1.2;text-wrap:balance">${esc(g)}</div><div style="font-weight:900;font-size:1.9cqw">${who?`第 ${who.rank} 名・${esc(who.name)}`:''}</div>`
-               : `<div style="font-family:var(--f-num);font-weight:700;font-size:9cqw;line-height:1;text-shadow:.05em .05em 0 var(--ink)">${n}</div>`}</div>`; }).join('')}</div>`;
+    <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 25cqw;gap:1.8cqw">
+    <div style="min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:1.3cqw">${G.map((g,i)=>{ const n=i+1, k=seq.indexOf(n), who=k>=0?L[k]:null, open=k>=0;
+      return `<div style="border:.3cqw solid var(--ink);border-radius:1.6cqw;box-shadow:.4cqw .4cqw 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5cqh;padding:.8cqh .8cqw;min-height:0;overflow:hidden;text-align:center;background:${open?(n===last?'var(--yellow)':'#fff'):'var(--pink)'};color:${open?'var(--ink)':'#fff'}">
+        ${open ? `<div style="font-family:var(--f-num);font-weight:700;font-size:1.5cqw;opacity:.6">${n} 號</div><div style="font-family:var(--f-display);font-weight:900;font-size:${n===last?2.5:2.1}cqw;line-height:1.2;text-wrap:balance">${esc(g)}</div><div style="font-weight:900;font-size:1.5cqw">${who?`第 ${who.rank} 名・${esc(who.name)}`:''}</div>`
+               : `<div style="font-family:var(--f-num);font-weight:700;font-size:8cqw;line-height:1;text-shadow:.05em .05em 0 var(--ink)">${n}</div>`}</div>`; }).join('')}</div>
+    <div style="min-height:0;display:flex;flex-direction:column;gap:.8cqh"><div style="font-weight:900;font-size:1.6cqw;color:var(--on-stage);text-align:center;flex:none">選號順序・第 4～12 名</div>
+      <ol style="list-style:none;margin:0;padding:0;flex:1;min-height:0;display:flex;flex-direction:column;gap:.9cqh">${side || '<li style="color:#fff;font-weight:700;font-size:1.6cqw;text-align:center">還沒有成績</li>'}</ol></div></div>`;
 }
 function hostLucky(c){
   const G = luckyGifts(c), seq = luckySeq(c), L = luckyList(), nxt = L[seq.length];
