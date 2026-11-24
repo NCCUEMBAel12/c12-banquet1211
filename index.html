@@ -1332,6 +1332,10 @@ function playerGame(c, rk, mine){
   if(c.phase==='puzzle') return playerPuzzle(c);
   if(c.phase==='timeline') return playerTimeline(c);
   if(c.phase==='bless') return c.blessOpen ? '' : `<div class="card"><div class="eyebrow">交接儀式</div><h2 class="h-l">${cerOf(c)===1 ? '信物交接中，請看舞台' : '一起看大螢幕上的祝福'}</h2></div>`;
+  if(c.phase==='gift'){ const L = luckyList(), seq = luckySeq(c), k = L.findIndex(x=>x.id===ME), G = luckyGifts(c);
+    const mine = k>=0 && k<seq.length ? `<div class="okline">🎁 你選了 ${seq[k]} 號：${esc(G[seq[k]-1])}</div>` : k>=0 ? `<div class="okline">${k===seq.length ? '輪到你了！請上台選一個號碼' : `你是第 ${L[k].rank} 名，前面還有 ${k-seq.length} 位就輪到你`}</div>` : '';
+    return `<div class="card" style="display:flex;flex-direction:column;gap:10px;text-align:center"><div class="eyebrow">頒獎 · 拾福袋</div><h2 class="h-l">第 4～12 名選號開獎</h2>${mine}<p class="muted" style="margin:0">9 個福袋、9 份「一打」好禮，打開才知道。請看大螢幕。</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${G.map((g,i)=>{ const n=i+1, j=seq.indexOf(n); return `<div style="border:var(--bd);border-radius:14px;padding:8px 4px;background:${j>=0?'#fff':'var(--pink)'};color:${j>=0?'var(--ink)':'#fff'};font-weight:900"><div class="num" style="font-size:22px">${n}</div><div style="font-size:12px;line-height:1.25">${j>=0?esc(g)+'<br>'+esc((L[j]||{}).name||''):'？'}</div></div>`; }).join('')}</div></div>`; }
   if(c.phase==='end' && isMC(ME)) return `<div class="card" style="display:flex;flex-direction:column;gap:8px;text-align:center"><div class="eyebrow">最終成績</div><h2 class="h-xl">主持人辛苦了</h2><div class="muted">主持人不列入排行</div><p style="margin:0">交接快樂！</p></div>`;
   if(c.phase==='end') return `<div class="card" style="display:flex;flex-direction:column;gap:8px;text-align:center">
       <div class="eyebrow">最終成績</div><div class="s-big num" style="color:var(--pink)">第 ${mine?mine.rank:'-'} 名</div>
@@ -1485,7 +1489,7 @@ const RUNDOWN = [
   {t:'19:37', e:'19:57', name:'拾夥伴＋拾時光', note:'拼圖找隊友 5 分鐘・同組聊近況 5 分鐘・時光排序 2 分鐘', ph:['puzzle','timeline'], host:'大家剛拍完大合照還站著，直接發拼圖。拼圖 7 分（說明 1、限時 5、成績 1）；拼好的同一組人聊近況 5 分（時間到自動進排序說明）；排序 7 分（說明 1、限時 2、公布與對照 4）；緩衝 1 分。時間到系統會自動結束拼圖、自動送出排序'},
   {t:'19:57', e:'20:12', name:'繼續用餐', note:'回座上菜', ph:['card:10'], host:'投影幕翻到「用餐時間」會自動輪播照片。請餐廳恢復出菜；前面超時的話從這裡吸收；投影幕可停在活動流程'},
   {t:'20:12', e:'20:32', name:'拾笑容', note:'指定姿勢合照・3 回合', ph:['photo'], host:'邊吃邊玩，餐廳照常出菜。總覽 1 分；每回合約 6 分（預告 1、拍照上傳 4、成績 1）；緩衝 1 分'},
-  {t:'20:32', e:'20:42', name:'頒獎：拾貳之星', note:'總排行', ph:['card:9','end'], host:'投影幕翻到「頒獎排行」'},
+  {t:'20:32', e:'20:42', name:'頒獎：拾貳之星', note:'總排行', ph:['card:9','gift','end'], host:'先翻到「頒獎排行」頒前三名；再玩「拾福袋」：第 4–12 名依序選號開獎（9 袋事先編號 1–9，對照表在主持人現場頁）'},
   {t:'20:42', e:'20:48', name:'伴手禮介紹', note:'龍の麵禮盒・拾系列紅包袋', ph:['card:14'], host:'大螢幕翻到伴手禮頁。主持人開場 → 家齊會長說龍の麵的故事 2–3 分 → 主持人介紹紅包袋 2 分（伴手禮報到入席時已發放）'},
   {t:'20:48', e:'21:15', name:'自由交流', note:'', ph:['card:11'], host:'投影幕翻到「自由交流」會輪播今晚的合照。緩衝時間：前面任何一段超時，都可以從這 27 分鐘吸收'},
   {t:'21:15', e:'21:30', name:'賦歸', note:'', ph:[], host:'21:15 活動結束，場地使用到 21:30'}
@@ -1574,7 +1578,7 @@ function playerRundown(c){
 }
 const PHASES = [['lobby','報到暖場','拾心意・祝福彈幕'],['rundown','開場','活動流程'],['quiz','遊戲一','拾記憶・快問快答'],['bless','交接儀式','信物交接・祝福回顧'],['puzzle','遊戲二・第 1 回','拾夥伴・拼圖找隊友'],['timeline','遊戲二・第 2 回','拾時光・時光排序'],['photo','遊戲三','拾笑容・指定姿勢合照'],['end','頒獎','拾貳之星・總排行＋照片牆']];
 /* ───── 主持人「現場」分頁：只留三件事——現在在哪、下一步是什麼、整晚走到哪 ───── */
-const pageKey = pg => pg.k==='lobby' ? 'lobby' : pg.k==='rd' ? 'rundown' : pg.k==='card' ? 'card:'+pg.i : /^(quiz0|q|qr|qrank)$/.test(pg.k) ? 'quiz' : pg.k==='cer2' ? 'bless2' : /^cer/.test(pg.k) ? 'bless' : /^pz/.test(pg.k) ? 'puzzle' : /^tl/.test(pg.k) ? 'timeline' : pg.k==='end' ? 'end' : 'photo';
+const pageKey = pg => pg.k==='lobby' ? 'lobby' : pg.k==='rd' ? 'rundown' : pg.k==='card' ? 'card:'+pg.i : /^(quiz0|q|qr|qrank)$/.test(pg.k) ? 'quiz' : pg.k==='cer2' ? 'bless2' : /^cer/.test(pg.k) ? 'bless' : /^pz/.test(pg.k) ? 'puzzle' : /^tl/.test(pg.k) ? 'timeline' : pg.k==='end' ? 'end' : pg.k==='gift' ? 'gift' : 'photo';
 const NEXT_HINT = {q:'按下後開始 '+QUIZ_SEC+' 秒倒數，時間到 2 秒後自動公布答案', qr:'公布答案並計分', pz1:'會立刻分組、把拼圖發到每支手機，開始倒數', pz2:'結束拼圖、顯示成績', tl1:'照片發到手機，開始倒數', tl2:'公布正確順序並計分', run:'會立刻分組，題目發到每支手機', done:'結束這一回合，顯示前三名', cer1:'換成交接背景字樣，這一頁沒有彈幕'};
 function liveStatus(c){
   const n = players().length, bl = visibleBless().length;
@@ -1586,6 +1590,7 @@ function liveStatus(c){
     if(c.roundState==='chat') return `第 ${r+1} 回合・聊近況中・剩 ${clock(chatDead(c))}`;
     return c.roundState==='running' ? `第 ${r+1} 回合進行中・完成上傳 <b>${photoRanks(r).length}</b>/${(allGroups()[r]||[]).length} 組` : `第 ${r+1} 回合結束・完成 ${photoRanks(r).length}/${(allGroups()[r]||[]).length} 組`; }
   if(c.phase==='bless') return cerOf(c)===1 ? '交接背景字樣（按鈕已隱藏，方便拍照）' : `播放祝福中・共 <b>${bl}</b> 則`;
+  if(c.phase==='gift'){ const L = luckyList(), n = luckySeq(c).length; return n>=L.length ? `全部開完了・共 ${n} 袋` : `已開 <b>${n}</b>/${L.length} 袋・輪到第 ${L[n].rank} 名 <b>${esc(L[n].name)}</b> 選號`; }
   if(c.phase==='end'){ const top = ranking()[0]; return top ? `第一名：${esc(top.name)}（${top.total} 分）` : ''; }
   return '';
 }
@@ -1612,6 +1617,7 @@ function hostLive(c){
       <div class="tpbtns"><button class="btn" data-act="turn" data-d="-1" ${pv && !ov ? '' : 'disabled'}>◀ 上一步</button>
         <button class="big-btn nextbtn" data-act="turn" data-d="1" ${!ov && !nx ? 'disabled' : ''}>${ov ? `收起投影幕上的「${ov}」` : nx ? `下一步：${esc(nx.t)} ▶` : '已經是最後一頁'}</button></div>
       ${!ov && nx && NEXT_HINT[nx.k] ? `<div class="muted" style="font-size:14px;text-align:center;margin-top:-6px">${NEXT_HINT[nx.k]}</div>` : ''}
+      ${cur.k==='gift' ? hostLucky(c) : ''}
       ${cueHTML(cur, c)}
     </div>
     <div class="tp-side">
@@ -1669,8 +1675,9 @@ const CUE = {
   'intro:2': ['最後一回合，全場分成**三大隊**，每隊十幾個人。人多好辦事，也可能人多嘴雜。這一回合拿下第一，分數最高。'],
   'run:2': ['**請三隊分別到指定的位置集合**，看手機上的題目，開始！','（其中一隊的題目是「大愛心」，LISA 會長、家齊會長、于老師和淑珠班媽都在這一隊，四位要站在愛心中間。）','（「大愛心」和「排出 12」都要從上往下拍，攝影師站椅子時請旁邊的人扶好。）'],
   'done:2': ['三回合全部完成！謝謝大家這麼放得開，今晚的照片保證比畢業照精彩。','所有的照片，手機「照片牆」都找得到，點開可以儲存。請大家回座喘口氣，**分數結算好了，答案要揭曉了。**'],
-  'card:9': ['三個遊戲玩完，大家的分數系統都幫我們算好了，沒有人工、沒有黑箱。今晚的「拾貳之星」，**一共取前 12 名**。','誰會是第一名呢？我們一起倒數，三、二、一！'],
-  'end': ['（從第 12 名往前念到第 4 名，每位請站起來接受掌聲；前三名一位一位請上台領獎。）','恭喜得獎的學長姐。其實今天每一位都是拾貳之星，因為有你們，創十二才是創十二。'],
+  'card:9': ['三個遊戲玩完，大家的分數系統都幫我們算好了，沒有人工、沒有黑箱。今晚的「拾貳之星」，**一共取前 12 名**，人人有獎。','誰會是第一名呢？我們一起倒數，三、二、一！'],
+  'gift': ['接下來請**第 4 名到第 12 名**準備，我們玩「拾福袋」。','台上有 **9 個福袋，編號 1 到 9**，裡面全部都是「一打」的好東西，有的很實用，有的很好吃，有的很重。裡面是什麼，**打開才知道**。','規則很簡單：**名次好的先選**。從第 4 名開始，上來報一個號碼，當場打開給大家看。','（念投影幕上輪到的名字，請他上台報號碼；在上面的號碼按鈕點那一號，投影幕就會翻開。）','（選號前可以放話：「我偷偷說，5 號很重喔。」「3 號剛剛有人一直盯著看。」）','（開出來時帶全場一起喊出禮物；開到衛生紙和開到堅果禮盒，都值得大聲歡呼。）','（最後一位只剩一袋）這就叫命中注定。','（得獎人已經先離席：請同組的人代選代領。）','九個福袋都有主人了！恭喜今晚的十二位拾貳之星。其實每一位都是，因為有你們，創十二才是創十二。','也謝謝今晚贊助獎品的**花花、奕君學姊**，還有準備伴手禮的**家齊會長**。'],
+  'end': ['（這一頁先頒前三名：第 3 名、第 2 名、第 1 名，一位一位請上台領獎、拍照。）','恭喜三位！第 4 名到第 12 名先不要失望，**你們的獎品還要再考驗一次手氣**。'],
   'card:14': ['在自由交流之前，想跟大家介紹一下，**大家一入席就拿到的那份伴手禮**。這是第二屆班聯會、家齊會長為今晚每一位準備的心意。','禮盒是**龍の麵**。這盒麵背後有一段故事，**我們請家齊會長親自跟大家說。**','（家齊會長分享龍の麵的故事，約 2–3 分鐘。）','（會長講完）謝謝家齊會長。','禮盒裡還有一套**「拾」系列紅包袋**，一共八款：**福、財、喜、安、緣、運、樂、祿**。','做紅包袋時，一開始只是想幫「十二」找諧音，結果發現十二到處都是**「一輪走完」**的單位：一年十二個月、一天十二時辰、一輪十二生肖，時辰和生肖用的就是**十二地支**，從子到亥剛好一輪；連時鐘走一圈也是十二格。','所以十二帶著**圓滿、然後重新開始**的意思，就像今晚：**第一屆走完一輪，交給第二屆開始下一輪。**','紅包袋沒有印年份和生肖，往後每一年都能用。希望大家用到它的時候，會想起創十二。','回家的時候別忘了帶走喔。'],
   'card:11': ['今天晚上，我們撿回了心意、記憶、夥伴、時光，還有滿滿的笑容。','謝謝第一屆班聯會這一年的付出，也祝福第二屆班聯會，帶著大家繼續往下走。**畢業不是結束，我們的故事才正要開始。**','接下來是自由交流時間，大家盡量聊、盡量拍。今晚的合照都在手機「照片牆」。','（21:15 賦歸）時間也晚了，謝謝各位老師、貴賓和學長姐今晚的參與。**回家路上請注意安全，有喝酒的請不要開車。**創十二，我們下次見！']
 };
@@ -1805,6 +1812,7 @@ function screenHTML(c){ // 投影幕這一頁的內容；主持人畫面的縮�
   if(c.phase==='puzzle') return screenPuzzle(c);
   if(c.phase==='timeline') return screenTimeline(c);
   if(c.phase==='bless') return screenBless(c);
+  if(c.phase==='gift') return screenLucky(c);
   return screenEnd();
 }
 function renderScreen(){
@@ -1828,7 +1836,7 @@ function pages(){ // 順序：祝福彈幕 → 流程 → 四段致詞 → 開�
     {k:'pz0', t:'拾夥伴・拼圖說明'}, {k:'pz1', t:'拼圖開始發圖'}, {k:'pz2', t:'拼圖成績'}, {k:'pzc', t:'同組聊近況 5 分鐘'}, {k:'tl0', t:'拾時光・排序說明'}, {k:'tl1', t:'排序開始'}, {k:'tl2', t:'排序公布答案'}, {k:'tl3', t:'各組作答對照'}, {k:'card', i:10, t:'用餐時間（照片輪播）'},
     {k:'overview', t:'拾笑容・合照總覽'});
   ROUNDS.forEach((R,i)=> P.push({k:'intro', r:i, t:`R${i+1} 預告`}, ...(R.chat ? [{k:'chat', r:i, t:`R${i+1} 分組・聊近況`}] : []), {k:'run', r:i, t: R.chat ? `R${i+1} 公布姿勢・拍照` : `R${i+1} 開始分組`}, {k:'done', r:i, t:`R${i+1} 成績`}));
-  P.push({k:'card', i:9, t:'頒獎（標題頁）'}, {k:'end', t:'拾貳之星・頒獎排行'}, {k:'card', i:14, t:'伴手禮介紹'}, {k:'card', i:11, t:'自由交流（照片輪播）'});
+  P.push({k:'card', i:9, t:'頒獎（標題頁）'}, {k:'end', t:'拾貳之星・頒獎排行（前三名）'}, {k:'gift', t:'拾福袋・選號開獎（第 4–12 名）'}, {k:'card', i:14, t:'伴手禮介紹'}, {k:'card', i:11, t:'自由交流（照片輪播）'});
   return P;
 }
 function curPage(P){
@@ -1845,6 +1853,7 @@ function curPage(P){
   if(c.phase==='puzzle') return f(x=>x.k===(c.pz==='idle'?'pz0':c.pz==='running'?'pz1':c.pz==='chat'?'pzc':'pz2'));
   if(c.phase==='timeline') return f(x=>x.k===(c.tl==='idle'?'tl0':c.tl==='running'?'tl1':c.tlv?'tl3':'tl2'));
   if(c.phase==='bless') return f(x=>x.k==='cer'+cerOf(c));
+  if(c.phase==='gift') return f(x=>x.k==='gift');
   return f(x=>x.k==='end');
 }
 function goPage(pg){ // 往回翻不會刪資料：已分好的組、已上傳的照片、已作答的紀錄都保留
@@ -1870,6 +1879,7 @@ function goPage(pg){ // 往回翻不會刪資料：已分好的組、已上傳�
   if(pg.k==='tl2') return set({phase:'timeline', tl:'reveal', tlv:0});
   if(pg.k==='tl3') return set({phase:'timeline', tl:'reveal', tlv:1});
   if(/^cer\d$/.test(pg.k)) return set({phase:'bless', cer:+pg.k.slice(3), blessOpen:pg.k!=='cer1', intro:-1});
+  if(pg.k==='gift') return set({phase:'gift', intro:-1});
   if(pg.k==='end') return set({phase:'end', intro:-1});
 }
 let turnAt = 0;
@@ -1989,6 +1999,34 @@ function screenBless(c){
   return `<div class="s-head"><h1 class="s-title">${ttl}<span class="s-gold">祝福</span></h1><span class="s-sub">${sub}${c.blessOpen?'・還有想說的話，現在也可以送':''}</span></div>
     <div class="bless-foot"><div><span class="s-big num" id="blN">0</span> <span class="s-sub">則祝福</span></div></div>`;
 }
+/* ───── 拾福袋：第 4–12 名依序選號，選到才公布禮物 ───── */
+const GIFT_DEFAULT = ['養生茶一打（桂圓紅棗枸杞）','精釀啤酒一打','暖暖包一打','TODAY NUT 綜合堅果禮盒','衛生紙一打','BACHA 濾掛咖啡禮盒','護手霜一打','高爾夫球一打','濕紙巾一打'];
+const luckyGifts = c => { const g = (c||ctrl()).gifts; return Array.isArray(g) && g.length ? g : GIFT_DEFAULT; };
+const luckySeq = c => ((c||ctrl()).gseq || []).filter(n=> n>=1 && n<=luckyGifts(c).length);
+const luckyList = () => ranking().slice(3, 3+luckyGifts().length).map((x,i)=>({...x, rank:i+4})); // 選號順序：第 4 名先選；同分時照排行榜上的先後，名次直接用順位
+function screenLucky(c){
+  const G = luckyGifts(c), seq = luckySeq(c), L = luckyList(), nxt = L[seq.length], last = seq[seq.length-1];
+  const cols = G.length<=6 ? 3 : G.length<=9 ? 3 : 4;
+  return `<div class="s-head"><h1 class="s-title">拾<span class="s-gold">福袋</span></h1><span class="s-sub">${nxt ? `輪到 第 ${nxt.rank} 名・<b style="color:var(--yellow);font-size:1.5em">${esc(nxt.name)}</b>　請選一個號碼` : seq.length ? '九個福袋都有主人了！' : '第 4～12 名依序選號，打開才知道'}</span></div>
+    <div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(${cols},minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:1.6cqw">${G.map((g,i)=>{ const n=i+1, k=seq.indexOf(n), who=k>=0?L[k]:null, open=k>=0;
+      return `<div style="border:.3cqw solid var(--ink);border-radius:1.8cqw;box-shadow:.4cqw .4cqw 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqh;padding:1cqh 1cqw;min-height:0;overflow:hidden;text-align:center;background:${open?(n===last?'var(--yellow)':'#fff'):'var(--pink)'};color:${open?'var(--ink)':'#fff'}">
+        ${open ? `<div style="font-family:var(--f-num);font-weight:700;font-size:1.8cqw;opacity:.6">${n} 號</div><div style="font-family:var(--f-display);font-weight:900;font-size:${n===last?3.1:2.5}cqw;line-height:1.2;text-wrap:balance">${esc(g)}</div><div style="font-weight:900;font-size:1.9cqw">${who?`第 ${who.rank} 名・${esc(who.name)}`:''}</div>`
+               : `<div style="font-family:var(--f-num);font-weight:700;font-size:9cqw;line-height:1;text-shadow:.05em .05em 0 var(--ink)">${n}</div>`}</div>`; }).join('')}</div>`;
+}
+function hostLucky(c){
+  const G = luckyGifts(c), seq = luckySeq(c), L = luckyList(), nxt = L[seq.length];
+  return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <b>${nxt ? `輪到第 ${nxt.rank} 名 ${esc(nxt.name)}${nxt.gone?'（已離席，請同組代選）':''}：他報幾號就點幾號` : L.length ? '全部開完了，按「下一步」頒前三名' : '還沒有成績，無法選號'}</b>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${G.map((g,i)=>{ const n=i+1, k=seq.indexOf(n), who=k>=0?L[k]:null;
+      return `<button class="btn ${k<0?'pri':''}" data-act="luckyPick" data-n="${n}" ${k>=0||!nxt?'disabled':''} style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;min-height:74px"><span class="num" style="font-size:24px;line-height:1">${n}</span><span style="font-size:12px;font-weight:700;line-height:1.25">${esc(g)}${who?`<br>→ ${esc(who.name)}`:''}</span></button>`; }).join('')}</div>
+    <div class="hrow"><button class="btn" data-act="luckyUndo" ${seq.length?'':'disabled'}>↩ 取消上一個</button><button class="btn" data-act="luckyReset" ${seq.length?'':'disabled'}>${window._luckyArm?'確定全部重來':'全部重來'}</button></div>
+    <div class="muted" style="font-size:13px">選號順序：${L.map((x,i)=>`<span style="${i<seq.length?'opacity:.45;text-decoration:line-through':i===seq.length?'font-weight:900;color:var(--pink)':''}">第${x.rank}名 ${esc(x.name)}</span>`).join('、')||'（尚無成績）'}</div>
+    <details><summary style="cursor:pointer;font-weight:900">福袋對照表（幾號袋裝什麼，只有主持人看得到）</summary>
+      <div class="muted" style="font-size:13px;margin:6px 0">一行一袋，第 1 行就是 1 號袋。請照這張表裝袋、貼號碼；想換順序就改這裡再按儲存。行數就是福袋數。</div>
+      <textarea id="luckyTxt" rows="${Math.max(9,G.length)}" style="width:100%;box-sizing:border-box;border:var(--bd);border-radius:12px;padding:10px;font-size:15px">${esc(G.join('\n'))}</textarea>
+      <div class="hrow" style="margin-top:6px"><button class="btn" data-act="luckySave">儲存對照表</button><button class="btn" data-act="luckyShuffle">隨機打亂順序</button><span class="okline">${window._luckyMsg||''}</span></div></details>
+  </div>`;
+}
 function screenEnd(){
   const rk = ranking(), ups = Object.values(S().uploads).sort((a,b)=>a.r-b.r||a.g-b.g);
   return `<div class="s-head"><h1 class="s-title">拾貳之星<span class="s-gold">排行榜</span></h1><span class="s-sub">第 1～12 名・合照＋快問快答＋拼圖＋排序總分</span></div>
@@ -2082,6 +2120,11 @@ const A = {
     $('#blText').value=''; $('#blCount').textContent='0/40'; render();
   },
   htab(b){ hTab = b.dataset.t; window._jumpArm = null; render(); },
+  luckyPick(b){ const c = ctrl(), n = +b.dataset.n, seq = luckySeq(c); if(seq.includes(n) || seq.length >= luckyList().length) return; window._luckyArm = false; return store.patch('meta','control',{gseq:[...seq, n]}); },
+  luckyUndo(){ window._luckyArm = false; return store.patch('meta','control',{gseq: luckySeq().slice(0,-1)}); },
+  luckyReset(){ if(!window._luckyArm){ window._luckyArm = true; return render(); } window._luckyArm = false; return store.patch('meta','control',{gseq:[]}); },
+  luckySave(){ const g = ($('#luckyTxt').value||'').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,12); if(!g.length) return; window._luckyMsg = '對照表已儲存'; return store.patch('meta','control',{gifts:g, gseq:[]}); },
+  luckyShuffle(){ const g = shuffle(luckyGifts()); window._luckyMsg = '已打亂，請照新的順序裝袋'; return store.patch('meta','control',{gifts:g, gseq:[]}); },
   hCount(){ hTab = 'checkin'; hSub.ck = 'list'; window._jumpArm = null; render(); },
   hsub(b){ hSub[b.dataset.g] = b.dataset.t; render(); },
   goGame(){ hTab = 'games'; hSub.gm = ctrl().phase; render(); },
@@ -2177,6 +2220,7 @@ const A = {
     if(k==='qrank'){ if(!Object.keys(S().answers).length){ for(let q=0;q<4;q++){ await goPage({k:'q', i:q}); A.simAns(); await new Promise(z=>setTimeout(z,60)); } } await goPage({k:'qrank'}); }
     if(k==='quizr'){ if(ctrl().quiz.state!=='q') await A.qstart({dataset:{i:String(Math.max(0, ctrl().quiz.i))}}); A.simAns(); await A.reveal(); }
     if(/^cer\d$/.test(k)){ if(!Object.keys(S().blessings).length) A.simBless(); await goPage({k}); }
+    if(k==='gift') await goPage({k:'gift'});
     if(k==='end') await store.patch('meta','control',{phase:'end', intro:-1});
     setTimeout(()=>{ spotMute = false; }, 300);
   },
@@ -2551,7 +2595,7 @@ function musicMood(c){
   if(c.phase==='puzzle') return c.pz==='chat' ? 'soft' : 'play'; // 發圖→成績同一組，音樂連續 // 聊近況：輕鬆歌單小聲播
   if(c.phase==='timeline') return c.tl==='idle' ? 'playsoft' : 'play'; // 排序開始→公布→對照同一組，音樂連續 // 排序說明小聲，開始排序後同一首音量回升
   if(c.phase==='photo') return 'play'; // 遊戲三從總覽到 R3 成績同一組，音樂連續
-  if(c.phase==='end') return 'party';
+  if(c.phase==='end' || c.phase==='gift') return 'party';
   return null;
 }
 const AU = {ctx:null, master:null, mus:null, noise:null, mood:null, want:undefined, step:0, next:0, localMute:false, cd:null, sw:0, el:null, file:false, idx:{}, title:'', bad:{}};
@@ -2692,7 +2736,7 @@ function seedDemo(){
       + '<span>遊戲二 拾夥伴</span>' + J('pz0','說明') + J('pz1','進行中') + J('pz2','成績') + J('pzc','聊近況') + '<span>拾時光</span>' + J('tl0','說明') + J('tl1','進行中') + J('tl2','公布') + J('tl3','對照') + K(10)
       + '<span>遊戲三 拾笑容</span>' + J('overview','總覽')
       + ROUNDS.map((R,i)=>`<span>R${i+1}</span>` + J('intro','預告',i) + (R.chat ? J('chat','聊近況',i) : '') + J('run','進行中',i) + J('done','成績',i)).join('')
-      + '<span>頒獎</span>' + K(9) + J('end','排行榜') + K(14) + K(11);
+      + '<span>頒獎</span>' + K(9) + J('end','排行榜') + J('gift','拾福袋') + K(14) + K(11);
   } else {
     try{
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
